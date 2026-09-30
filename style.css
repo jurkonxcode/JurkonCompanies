@@ -1,1 +1,196 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
+body {
+    font-family: Arial, sans-serif;
+    background: #10151c;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+#game {
+    min-height: 100vh;
+}
+
+.screen {
+    display: none;
+    min-height: 100vh;
+    padding: 30px 20px;
+}
+
+.screen.active {
+    display: flex;
+}
+
+
+/* WELCOME */
+
+#welcome {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.logo {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.logo span {
+    display: block;
+    font-size: 18px;
+    letter-spacing: 7px;
+    margin-top: 5px;
+}
+
+.subtitle {
+    color: #aeb8c5;
+    margin: 20px 0 40px;
+}
+
+
+/* BUTTON */
+
+button {
+    width: 100%;
+    max-width: 320px;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    background: #3b82f6;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button.secondary {
+    background: transparent;
+    color: #9aa6b2;
+    margin-top: 10px;
+}
+
+
+/* TUTORIAL */
+
+#tutorial {
+    align-items: center;
+    justify-content: center;
+}
+
+.tutorial-box {
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    background: #18202b;
+    border-radius: 18px;
+    padding: 35px 25px;
+}
+
+#tutorialIcon {
+    font-size: 70px;
+    margin-bottom: 20px;
+}
+
+.tutorial-box h1 {
+    margin-bottom: 15px;
+}
+
+.tutorial-box p {
+    color: #b5bfca;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.tutorial-progress {
+    color: #6fa8ff;
+    margin-bottom: 20px;
+}
+
+
+/* CREATE COMPANY */
+
+#createCompany {
+    align-items: center;
+    justify-content: center;
+}
+
+.company-box {
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.company-box p {
+    color: #aeb8c5;
+    margin: 15px 0 25px;
+}
+
+input {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 15px;
+    border: 1px solid #34404f;
+    border-radius: 10px;
+    background: #18202b;
+    color: white;
+    font-size: 16px;
+}
+
+
+/* HQ */
+
+#hq {
+    flex-direction: column;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #18202b;
+    border-radius: 12px;
+}
+
+.topbar small {
+    display: block;
+    color: #8996a5;
+    margin-top: 4px;
+}
+
+.money {
+    font-weight: bold;
+    color: #8bd17c;
+}
+
+.hq-content {
+    padding: 30px 5px;
+}
+
+.hq-content > p {
+    color: #aeb8c5;
+    margin: 10px 0 25px;
+}
+
+.building-card {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    padding: 20px;
+    background: #18202b;
+    border-radius: 14px;
+}
+
+.building-icon {
+    font-size: 45px;
+}
