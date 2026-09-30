@@ -1,1 +1,11 @@
-
+{
+  "farm": {
+    "id": "farm",
+    "name": "Farm",
+    "category": "production",
+    "maxLevel": 10,
+    "produces": [
+      "apple"
+    ]
+  }
+}
