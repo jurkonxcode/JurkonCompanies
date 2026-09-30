@@ -224,3 +224,14 @@ const TutorialEngine = {
     }
 
 };
+GameEvents.on(
+    "building.created",
+    function (data) {
+
+        console.log(
+            "Tutorial mendeteksi building:",
+            data.building.type
+        );
+
+    }
+);
