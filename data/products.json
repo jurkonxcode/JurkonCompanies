@@ -5,12 +5,14 @@
     "category": "resource",
     "baseQuality": 1
   },
+
   "seed": {
     "id": "seed",
     "name": "Seed",
     "category": "resource",
     "baseQuality": 1
   },
+
   "apple": {
     "id": "apple",
     "name": "Apple",
