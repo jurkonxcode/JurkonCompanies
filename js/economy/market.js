@@ -1,6 +1,6 @@
 // JurkonCompanies
 // Market / Exchange Engine
-// Version: 0.1
+// Version: 0.2
 
 const MarketEngine = {
 
@@ -8,7 +8,7 @@ const MarketEngine = {
 
     /*
      * ==========================================
-     * LISTING
+     * CREATE LISTING
      * ==========================================
      */
 
@@ -41,6 +41,12 @@ const MarketEngine = {
         if (unitPrice < 0) {
             throw new Error(
                 "Harga tidak boleh negatif."
+            );
+        }
+
+        if (quality <= 0) {
+            throw new Error(
+                "Quality harus lebih besar dari 0."
             );
         }
 
@@ -78,7 +84,7 @@ const MarketEngine = {
 
     /*
      * ==========================================
-     * QUERY
+     * GET LISTING
      * ==========================================
      */
 
@@ -90,6 +96,12 @@ const MarketEngine = {
         ) || null;
     },
 
+
+    /*
+     * ==========================================
+     * GET ACTIVE LISTINGS
+     * ==========================================
+     */
 
     getActiveListings(productId = null) {
 
@@ -103,17 +115,29 @@ const MarketEngine = {
                 }
 
                 if (
+                    listing.quantity <= 0
+                ) {
+                    return false;
+                }
+
+                if (
                     productId &&
                     listing.productId !== productId
                 ) {
                     return false;
                 }
 
-                return listing.quantity > 0;
+                return true;
             }
         );
     },
 
+
+    /*
+     * ==========================================
+     * GET PRODUCT LISTINGS
+     * ==========================================
+     */
 
     getListingsForProduct(productId) {
 
@@ -157,7 +181,9 @@ const MarketEngine = {
             };
         }
 
-        if (quantity <= 0) {
+        if (
+            quantity <= 0
+        ) {
 
             return {
                 success: false,
@@ -178,7 +204,8 @@ const MarketEngine = {
         }
 
         const totalCost =
-            listing.unitPrice * quantity;
+            listing.unitPrice *
+            quantity;
 
         if (
             getCash() < totalCost
@@ -255,7 +282,7 @@ const MarketEngine = {
             return {
                 success: false,
                 reason:
-                    "Transaksi cash gagal."
+                    "Cash gagal dikurangi."
             };
         }
 
@@ -274,7 +301,7 @@ const MarketEngine = {
 
         /*
          * --------------------------------------
-         * LISTING
+         * UPDATE LISTING
          * --------------------------------------
          */
 
@@ -285,13 +312,14 @@ const MarketEngine = {
         ) {
 
             listing.quantity = 0;
+
             listing.status = "sold";
         }
 
 
         /*
          * --------------------------------------
-         * TRANSACTION
+         * CREATE TRANSACTION
          * --------------------------------------
          */
 
@@ -301,7 +329,8 @@ const MarketEngine = {
 
             type: "market_purchase",
 
-            listingId: listing.id,
+            listingId:
+                listing.id,
 
             productId:
                 listing.productId,
@@ -323,8 +352,54 @@ const MarketEngine = {
             quality:
                 listing.quality,
 
-            timestamp: Date.now()
+            timestamp:
+                Date.now()
         };
+
+
+        /*
+         * --------------------------------------
+         * RECORD TRANSACTION
+         * --------------------------------------
+         */
+
+        if (
+            typeof TransactionEngine !==
+            "undefined"
+        ) {
+
+            TransactionEngine.record({
+
+                type:
+                    "market_purchase",
+
+                category:
+                    "inventory",
+
+                amount:
+                    totalCost,
+
+                productId:
+                    listing.productId,
+
+                quantity,
+
+                metadata: {
+
+                    listingId:
+                        listing.id,
+
+                    sellerId:
+                        listing.sellerId,
+
+                    unitPrice:
+                        listing.unitPrice,
+
+                    quality:
+                        listing.quality
+                }
+            });
+        }
 
 
         /*
@@ -357,7 +432,7 @@ const MarketEngine = {
 
     /*
      * ==========================================
-     * SELL
+     * SELL VALIDATION
      * ==========================================
      */
 
@@ -376,7 +451,9 @@ const MarketEngine = {
             };
         }
 
-        if (quantity <= 0) {
+        if (
+            quantity <= 0
+        ) {
 
             return {
                 success: false,
@@ -385,7 +462,9 @@ const MarketEngine = {
             };
         }
 
-        if (unitPrice < 0) {
+        if (
+            unitPrice < 0
+        ) {
 
             return {
                 success: false,
@@ -413,6 +492,12 @@ const MarketEngine = {
         };
     },
 
+
+    /*
+     * ==========================================
+     * SELL
+     * ==========================================
+     */
 
     sell(
         productId,
@@ -495,6 +580,46 @@ const MarketEngine = {
 
         /*
          * --------------------------------------
+         * RECORD LISTING TRANSACTION
+         * --------------------------------------
+         */
+
+        if (
+            typeof TransactionEngine !==
+            "undefined"
+        ) {
+
+            TransactionEngine.record({
+
+                type:
+                    "market_sale_listed",
+
+                category:
+                    "inventory",
+
+                amount:
+                    unitPrice *
+                    quantity,
+
+                productId,
+
+                quantity,
+
+                metadata: {
+
+                    listingId:
+                        listing.id,
+
+                    unitPrice,
+
+                    quality
+                }
+            });
+        }
+
+
+        /*
+         * --------------------------------------
          * EVENT
          * --------------------------------------
          */
@@ -543,7 +668,7 @@ const MarketEngine = {
 
 
         /*
-         * Return inventory
+         * Return goods to inventory
          */
 
         addInventory(
@@ -552,7 +677,8 @@ const MarketEngine = {
         );
 
 
-        listing.status = "cancelled";
+        listing.status =
+            "cancelled";
 
 
         GameEvents.emit(
@@ -569,7 +695,7 @@ const MarketEngine = {
 
     /*
      * ==========================================
-     * MARKET STATISTICS
+     * LOWEST PRICE
      * ==========================================
      */
 
@@ -583,6 +709,7 @@ const MarketEngine = {
         if (
             listings.length === 0
         ) {
+
             return null;
         }
 
@@ -595,6 +722,12 @@ const MarketEngine = {
     },
 
 
+    /*
+     * ==========================================
+     * TOTAL AVAILABLE
+     * ==========================================
+     */
+
     getTotalAvailable(productId) {
 
         return this
@@ -602,10 +735,63 @@ const MarketEngine = {
                 productId
             )
             .reduce(
-                (total, listing) =>
-                    total + listing.quantity,
+                (
+                    total,
+                    listing
+                ) =>
+                    total +
+                    listing.quantity,
                 0
             );
+    },
+
+
+    /*
+     * ==========================================
+     * MARKET SUMMARY
+     * ==========================================
+     */
+
+    getMarketSummary(productId) {
+
+        const listings =
+            this.getListingsForProduct(
+                productId
+            );
+
+        if (
+            listings.length === 0
+        ) {
+
+            return {
+
+                productId,
+
+                listingCount: 0,
+
+                totalQuantity: 0,
+
+                lowestPrice: null
+            };
+        }
+
+        return {
+
+            productId,
+
+            listingCount:
+                listings.length,
+
+            totalQuantity:
+                this.getTotalAvailable(
+                    productId
+                ),
+
+            lowestPrice:
+                this.getLowestPrice(
+                    productId
+                )
+        };
     }
 };
 
@@ -621,9 +807,23 @@ GameEvents.on(
     data => {
 
         console.log(
-            `Membeli ${data.transaction.quantity} ` +
+            `Membeli ` +
+            `${data.transaction.quantity} ` +
             `${data.transaction.productId} ` +
-            `seharga $${data.transaction.total}.`
+            `seharga $` +
+            `${data.transaction.total}.`
+        );
+    }
+);
+
+
+GameEvents.on(
+    "market.purchase.failed",
+    data => {
+
+        console.warn(
+            "Market purchase gagal:",
+            data.reason
         );
     }
 );
@@ -634,37 +834,36 @@ GameEvents.on(
     data => {
 
         console.log(
-            `Menjual ${data.listing.quantity} ` +
+            `Menjual ` +
+            `${data.listing.quantity} ` +
             `${data.listing.productId} ` +
-            `seharga $${data.listing.unitPrice} / unit.`
+            `seharga $` +
+            `${data.listing.unitPrice}` +
+            ` / unit.`
         );
     }
 );
-TransactionEngine.record({
 
-    type: "market_purchase",
 
-    category: "inventory",
+GameEvents.on(
+    "market.sale.failed",
+    data => {
 
-    amount: totalCost,
-
-    productId:
-        listing.productId,
-
-    quantity,
-
-    metadata: {
-
-        listingId:
-            listing.id,
-
-        sellerId:
-            listing.sellerId,
-
-        unitPrice:
-            listing.unitPrice,
-
-        quality:
-            listing.quality
+        console.warn(
+            "Market sale gagal:",
+            data.reason
+        );
     }
-});
+);
+
+
+GameEvents.on(
+    "market.listing.cancelled",
+    data => {
+
+        console.log(
+            "Listing dibatalkan:",
+            data.listing.id
+        );
+    }
+);
