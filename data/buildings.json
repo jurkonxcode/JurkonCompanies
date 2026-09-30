@@ -3,9 +3,16 @@
     "id": "farm",
     "name": "Farm",
     "category": "production",
+
     "maxLevel": 10,
+
     "produces": [
       "apple"
-    ]
+    ],
+
+    "production": {
+      "baseEfficiency": 1,
+      "outputPerLevel": 0.1
+    }
   }
 }
