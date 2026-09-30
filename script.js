@@ -158,3 +158,6 @@ GameEvents.on(
         }
     }
 );
+setTimeout(() => {
+    runEconomyVisualTest();
+}, 1000);
