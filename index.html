@@ -1,1 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>JurkonCompanies</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main id="game">
+
+        <!-- WELCOME -->
+        <section id="welcome" class="screen active">
+
+            <div class="logo">
+                JURKON
+                <span>COMPANIES</span>
+            </div>
+
+            <p class="subtitle">
+                Build your company. Create your economy.
+            </p>
+
+            <button onclick="startTutorial()">
+                Mulai Perjalanan
+            </button>
+
+        </section>
+
+
+        <!-- TUTORIAL -->
+        <section id="tutorial" class="screen">
+
+            <div class="tutorial-box">
+
+                <div id="tutorialIcon">🏢</div>
+
+                <h1 id="tutorialTitle">
+                    Selamat Datang
+                </h1>
+
+                <p id="tutorialText">
+                    Selamat datang di JurkonCompanies.
+                    Kamu akan memulai perjalanan sebagai pemilik
+                    perusahaan baru.
+                </p>
+
+                <div class="tutorial-progress">
+                    <span id="tutorialStep">1 / 5</span>
+                </div>
+
+                <button onclick="nextTutorial()">
+                    Lanjut
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="skipTutorial()">
+                    Lewati Tutorial
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- CREATE COMPANY -->
+        <section id="createCompany" class="screen">
+
+            <div class="company-box">
+
+                <h1>Dirikan Perusahaan</h1>
+
+                <p>
+                    Setiap perusahaan besar dimulai dari sebuah nama.
+                </p>
+
+                <input
+                    id="companyName"
+                    type="text"
+                    maxlength="30"
+                    placeholder="Nama perusahaan">
+
+                <button onclick="createCompany()">
+                    Dirikan Perusahaan
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- HQ -->
+        <section id="hq" class="screen">
+
+            <header class="topbar">
+
+                <div>
+                    <strong id="companyDisplay">
+                        Perusahaan
+                    </strong>
+
+                    <small>
+                        Level 1
+                    </small>
+                </div>
+
+                <div class="money">
+                    $<span id="money">10,000</span>
+                </div>
+
+            </header>
+
+
+            <div class="hq-content">
+
+                <h1>Headquarters</h1>
+
+                <p>
+                    Selamat datang di perusahaanmu.
+                </p>
+
+                <div class="building-card">
+
+                    <div class="building-icon">
+                        🏭
+                    </div>
+
+                    <div>
+                        <h2>Pabrik Pertama</h2>
+
+                        <p>
+                            Produksi belum dimulai.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
