@@ -1,78 +1,100 @@
 // JurkonCompanies
 // Production Engine
-// Version: 0.1
+// Version: 0.2
 
 const ProductionEngine = {
 
     jobs: [],
 
-    /**
-     * Ambil recipe berdasarkan product ID.
-     * Untuk sementara recipe berasal dari window.GameRecipes
-     * yang nanti akan di-load dari data/recipes.json.
+    /*
+     * ==========================================
+     * DATA
+     * ==========================================
      */
+
     getRecipe(productId) {
 
         if (
-            typeof GameRecipes === "undefined" ||
-            !GameRecipes[productId]
+            !GameData.loaded
         ) {
             console.error(
-                `Recipe tidak ditemukan: ${productId}`
+                "Game data belum dimuat."
             );
 
             return null;
         }
 
-        return GameRecipes[productId];
+        return GameData.getRecipe(
+            productId
+        );
     },
 
-    /**
-     * Cari building berdasarkan ID.
-     */
     getBuilding(buildingId) {
 
-        if (
-            typeof getBuilding !== "function"
-        ) {
-            console.error(
-                "Building system belum tersedia."
-            );
+        return GameState.buildings.find(
+            building =>
+                building.id === buildingId
+        ) || null;
+    },
 
+    getBuildingDefinition(buildingType) {
+
+        if (
+            !GameData.loaded
+        ) {
             return null;
         }
 
-        return getBuilding(buildingId);
+        return GameData.getBuilding(
+            buildingType
+        );
     },
 
-    /**
-     * Memeriksa apakah building dapat melakukan produksi.
+
+    /*
+     * ==========================================
+     * VALIDATION
+     * ==========================================
      */
-    canProduce(buildingId, productId) {
+
+    canProduce(
+        buildingId,
+        productId
+    ) {
 
         const building =
-            this.getBuilding(buildingId);
+            this.getBuilding(
+                buildingId
+            );
 
         if (!building) {
+
             return {
                 success: false,
-                reason: "Building tidak ditemukan."
+                reason:
+                    "Building tidak ditemukan."
             };
         }
 
         const recipe =
-            this.getRecipe(productId);
+            this.getRecipe(
+                productId
+            );
 
         if (!recipe) {
+
             return {
                 success: false,
-                reason: "Recipe tidak ditemukan."
+                reason:
+                    "Recipe tidak ditemukan."
             };
         }
 
         if (
-            building.type !== recipe.building
+            building.type !==
+            recipe.building
         ) {
+
             return {
                 success: false,
                 reason:
@@ -81,8 +103,10 @@ const ProductionEngine = {
         }
 
         if (
-            building.status !== "idle"
+            building.status !==
+            "idle"
         ) {
+
             return {
                 success: false,
                 reason:
@@ -91,22 +115,23 @@ const ProductionEngine = {
         }
 
         for (
-            const productId in recipe.inputs
+            const inputId in recipe.inputs
         ) {
 
             const required =
-                recipe.inputs[productId];
+                recipe.inputs[inputId];
 
             if (
                 !hasInventory(
-                    productId,
+                    inputId,
                     required
                 )
             ) {
+
                 return {
                     success: false,
                     reason:
-                        `Inventory ${productId} tidak cukup.`
+                        `Inventory ${inputId} tidak cukup.`
                 };
             }
         }
@@ -116,9 +141,146 @@ const ProductionEngine = {
         };
     },
 
-    /**
-     * Memulai production job.
+
+    /*
+     * ==========================================
+     * MODIFIERS
+     * ==========================================
      */
+
+    getProductionModifiers(
+        building,
+        recipe
+    ) {
+
+        const modifiers = {
+
+            outputMultiplier: 1,
+
+            timeMultiplier: 1,
+
+            efficiencyMultiplier: 1
+        };
+
+
+        /*
+         * Beginner Boost
+         */
+
+        if (
+            GameState.newPlayer
+                .beginnerBoostActive === true &&
+
+            recipe.modifiers &&
+
+            recipe.modifiers
+                .beginnerBoostEligible === true
+        ) {
+
+            modifiers.outputMultiplier *= 2;
+        }
+
+
+        /*
+         * Building level
+         */
+
+        const definition =
+            this.getBuildingDefinition(
+                building.type
+            );
+
+        if (
+            definition &&
+            definition.production &&
+            recipe.modifiers &&
+            recipe.modifiers
+                .buildingLevelAffectsOutput
+        ) {
+
+            const outputPerLevel =
+                definition.production
+                    .outputPerLevel || 0;
+
+            const levelBonus =
+                (
+                    building.level - 1
+                ) *
+                outputPerLevel;
+
+            modifiers.outputMultiplier *=
+                1 + levelBonus;
+        }
+
+
+        return modifiers;
+    },
+
+
+    /*
+     * ==========================================
+     * OUTPUT CALCULATION
+     * ==========================================
+     */
+
+    calculateOutput(
+        building,
+        recipe,
+        modifiers
+    ) {
+
+        const baseQuantity =
+            recipe.quantity;
+
+        const finalQuantity =
+            baseQuantity *
+            modifiers.outputMultiplier;
+
+        /*
+         * Untuk sementara kita menjaga
+         * quantity integer.
+         *
+         * Sistem fractional production
+         * dapat ditambahkan nanti.
+         */
+
+        return Math.max(
+            1,
+            Math.floor(
+                finalQuantity
+            )
+        );
+    },
+
+
+    /*
+     * ==========================================
+     * PRODUCTION TIME
+     * ==========================================
+     */
+
+    calculateProductionTime(
+        recipe,
+        modifiers
+    ) {
+
+        const baseTime =
+            recipe.productionTime;
+
+        return Math.max(
+            1,
+            baseTime *
+            modifiers.timeMultiplier
+        );
+    },
+
+
+    /*
+     * ==========================================
+     * START PRODUCTION
+     * ==========================================
+     */
+
     startProduction(
         buildingId,
         productId
@@ -130,25 +292,77 @@ const ProductionEngine = {
                 productId
             );
 
-        if (!validation.success) {
+        if (
+            !validation.success
+        ) {
 
             console.warn(
                 validation.reason
             );
 
+            GameEvents.emit(
+                "production.failed",
+                {
+                    buildingId,
+                    productId,
+                    reason:
+                        validation.reason
+                }
+            );
+
             return null;
         }
 
+
         const building =
-            this.getBuilding(buildingId);
+            this.getBuilding(
+                buildingId
+            );
 
         const recipe =
-            this.getRecipe(productId);
+            this.getRecipe(
+                productId
+            );
+
 
         /*
-         * Konsumsi semua input
-         * sebelum job dimulai.
+         * Ambil modifier
          */
+
+        const modifiers =
+            this.getProductionModifiers(
+                building,
+                recipe
+            );
+
+
+        /*
+         * Hitung hasil
+         */
+
+        const outputQuantity =
+            this.calculateOutput(
+                building,
+                recipe,
+                modifiers
+            );
+
+
+        /*
+         * Hitung waktu
+         */
+
+        const durationSeconds =
+            this.calculateProductionTime(
+                recipe,
+                modifiers
+            );
+
+
+        /*
+         * Konsumsi input
+         */
+
         for (
             const inputId in recipe.inputs
         ) {
@@ -165,18 +379,17 @@ const ProductionEngine = {
             if (!removed) {
 
                 console.error(
-                    "Gagal mengonsumsi input produksi."
+                    "Input produksi gagal dikonsumsi."
                 );
 
                 return null;
             }
         }
 
+
         const now =
             Date.now();
 
-        const duration =
-            recipe.productionTime * 1000;
 
         const job = {
 
@@ -190,19 +403,30 @@ const ProductionEngine = {
                 productId,
 
             quantity:
-                recipe.quantity,
+                outputQuantity,
 
             startedAt:
                 now,
 
+            durationSeconds:
+                durationSeconds,
+
             completesAt:
-                now + duration,
+                now +
+                durationSeconds * 1000,
 
             status:
-                "running"
+                "running",
+
+            modifiers:
+                modifiers
         };
 
-        this.jobs.push(job);
+
+        this.jobs.push(
+            job
+        );
+
 
         building.status =
             "producing";
@@ -210,32 +434,42 @@ const ProductionEngine = {
         building.production =
             job;
 
+
         GameEvents.emit(
             "production.started",
             {
-                job: job,
-                building: building,
-                recipe: recipe
+                job,
+                building,
+                recipe
             }
         );
+
 
         console.log(
             "Production dimulai:",
             job
         );
 
+
         return job;
     },
 
-    /**
-     * Menyelesaikan production job.
+
+    /*
+     * ==========================================
+     * COMPLETE
+     * ==========================================
      */
-    completeProduction(jobId) {
+
+    completeProduction(
+        jobId
+    ) {
 
         const job =
             this.jobs.find(
                 item =>
-                    item.id === jobId
+                    item.id ===
+                    jobId
             );
 
         if (!job) {
@@ -243,10 +477,12 @@ const ProductionEngine = {
         }
 
         if (
-            job.status !== "running"
+            job.status !==
+            "running"
         ) {
             return false;
         }
+
 
         const building =
             this.getBuilding(
@@ -257,6 +493,7 @@ const ProductionEngine = {
             return false;
         }
 
+
         const recipe =
             this.getRecipe(
                 job.productId
@@ -266,14 +503,16 @@ const ProductionEngine = {
             return false;
         }
 
+
         /*
-         * Masukkan hasil produksi
-         * ke inventory.
+         * Masukkan hasil
          */
+
         addInventory(
             job.productId,
             job.quantity
         );
+
 
         job.status =
             "completed";
@@ -281,23 +520,26 @@ const ProductionEngine = {
         job.completedAt =
             Date.now();
 
+
         building.status =
             "idle";
 
         building.production =
             null;
 
+
         /*
-         * Tandai produksi pertama
-         * untuk onboarding.
+         * First production
          */
+
         if (
             GameState.newPlayer
                 .firstProductionCompleted === false
         ) {
 
             GameState.newPlayer
-                .firstProductionCompleted = true;
+                .firstProductionCompleted =
+                true;
 
             if (
                 typeof TutorialEngine !==
@@ -309,29 +551,33 @@ const ProductionEngine = {
             }
         }
 
+
         GameEvents.emit(
             "production.completed",
             {
-                job: job,
-                building: building,
-                recipe: recipe
+                job,
+                building,
+                recipe
             }
         );
+
 
         console.log(
             "Production selesai:",
             job
         );
 
+
         return true;
     },
 
-    /**
-     * Memeriksa semua production job.
-     *
-     * Nanti fungsi ini akan menjadi
-     * fondasi offline/background simulation.
+
+    /*
+     * ==========================================
+     * UPDATE
+     * ==========================================
      */
+
     update() {
 
         const now =
@@ -340,7 +586,8 @@ const ProductionEngine = {
         this.jobs
             .filter(
                 job =>
-                    job.status === "running"
+                    job.status ===
+                    "running"
             )
             .forEach(
                 job => {
@@ -358,17 +605,39 @@ const ProductionEngine = {
             );
     },
 
-    /**
-     * Ambil semua job produksi.
+
+    /*
+     * ==========================================
+     * OFFLINE / RESUME
+     * ==========================================
      */
+
+    resume() {
+
+        this.update();
+    },
+
+
+    /*
+     * ==========================================
+     * QUERIES
+     * ==========================================
+     */
+
     getJobs() {
 
         return this.jobs;
     },
 
-    /**
-     * Ambil job berdasarkan building.
-     */
+    getRunningJobs() {
+
+        return this.jobs.filter(
+            job =>
+                job.status ===
+                "running"
+        );
+    },
+
     getJobForBuilding(
         buildingId
     ) {
@@ -377,7 +646,80 @@ const ProductionEngine = {
             job =>
                 job.buildingId ===
                 buildingId &&
-                job.status === "running"
+
+                job.status ===
+                "running"
+        ) || null;
+    },
+
+    getRemainingSeconds(
+        jobId
+    ) {
+
+        const job =
+            this.jobs.find(
+                item =>
+                    item.id ===
+                    jobId
+            );
+
+        if (!job) {
+            return 0;
+        }
+
+        const remaining =
+            job.completesAt -
+            Date.now();
+
+        return Math.max(
+            0,
+            Math.ceil(
+                remaining / 1000
+            )
         );
     }
 };
+
+
+/*
+ * ==========================================
+ * GLOBAL UPDATE LOOP
+ * ==========================================
+ */
+
+setInterval(
+    () => {
+
+        ProductionEngine.update();
+
+    },
+    1000
+);
+
+
+/*
+ * ==========================================
+ * EVENTS
+ * ==========================================
+ */
+
+GameEvents.on(
+    "production.started",
+    data => {
+
+        console.log(
+            `Production ${data.job.productId} dimulai.`
+        );
+    }
+);
+
+
+GameEvents.on(
+    "production.completed",
+    data => {
+
+        console.log(
+            `Production ${data.job.productId} selesai.`
+        );
+    }
+);
