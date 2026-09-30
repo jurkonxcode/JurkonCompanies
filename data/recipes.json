@@ -2,11 +2,19 @@
   "apple": {
     "product": "apple",
     "quantity": 1,
+
     "inputs": {
       "water": 3,
       "seed": 1
     },
+
     "productionTime": 60,
-    "building": "farm"
+
+    "building": "farm",
+
+    "modifiers": {
+      "beginnerBoostEligible": true,
+      "buildingLevelAffectsOutput": true
+    }
   }
 }
