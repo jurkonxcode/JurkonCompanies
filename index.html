@@ -2,7 +2,16 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="JurkonCompanies - Business Simulation Game"
+    >
 
     <title>JurkonCompanies</title>
 
@@ -11,56 +20,40 @@
 
 <body>
 
-    <main id="game">
+    <!-- =====================================================
+         APPLICATION
+         ===================================================== -->
 
-        <!-- WELCOME -->
-        <section id="welcome" class="screen active">
-
-            <div class="logo">
-                JURKON
-                <span>COMPANIES</span>
-            </div>
-
-            <p class="subtitle">
-                Build your company. Create your economy.
-            </p>
-
-            <button onclick="startTutorial()">
-                Mulai Perjalanan
-            </button>
-
-        </section>
+    <div id="app">
 
 
-        <!-- TUTORIAL -->
-        <section id="tutorial" class="screen">
+        <!-- =================================================
+             WELCOME SCREEN
+             ================================================= -->
 
-            <div class="tutorial-box">
+        <section
+            id="welcome"
+            class="screen active"
+        >
 
-                <div id="tutorialIcon">🏢</div>
+            <div class="welcome-container">
 
-                <h1 id="tutorialTitle">
-                    Selamat Datang
-                </h1>
-
-                <p id="tutorialText">
-                    Selamat datang di JurkonCompanies.
-                    Kamu akan memulai perjalanan sebagai pemilik
-                    perusahaan baru.
-                </p>
-
-                <div class="tutorial-progress">
-                    <span id="tutorialStep">1 / 5</span>
+                <div class="logo">
+                    JURKON
+                    <span>COMPANIES</span>
                 </div>
 
-                <button onclick="nextTutorial()">
-                    Lanjut
-                </button>
+                <p class="welcome-subtitle">
+                    Bangun perusahaanmu.
+                    Kelola sumber daya.
+                    Kuasai pasar.
+                </p>
 
                 <button
-                    class="secondary"
-                    onclick="skipTutorial()">
-                    Lewati Tutorial
+                    id="startJourneyButton"
+                    type="button"
+                >
+                    Mulai Perjalanan
                 </button>
 
             </div>
@@ -68,85 +61,1133 @@
         </section>
 
 
-        <!-- CREATE COMPANY -->
-        <section id="createCompany" class="screen">
+        <!-- =================================================
+             TUTORIAL SCREEN
+             ================================================= -->
 
-            <div class="company-box">
+        <section
+            id="tutorial"
+            class="screen"
+        >
 
-                <h1>Dirikan Perusahaan</h1>
+            <div class="tutorial-container">
 
-                <p>
-                    Setiap perusahaan besar dimulai dari sebuah nama.
-                </p>
+                <div class="tutorial-header">
 
-                <input
-                    id="companyName"
-                    type="text"
-                    maxlength="30"
-                    placeholder="Nama perusahaan">
+                    <span id="tutorialStepLabel">
+                        Tutorial
+                    </span>
 
-                <button onclick="createCompany()">
-                    Dirikan Perusahaan
-                </button>
+                    <h1 id="tutorialTitle">
+                        Selamat datang
+                    </h1>
 
-            </div>
-
-        </section>
-
-
-        <!-- HQ -->
-        <section id="hq" class="screen">
-
-            <header class="topbar">
-
-                <div>
-                    <strong id="companyDisplay">
-                        Perusahaan
-                    </strong>
-
-                    <small>
-                        Level 1
-                    </small>
                 </div>
 
-                <div class="money">
-                    $<span id="money">10,000</span>
+
+                <div class="tutorial-content">
+
+                    <p id="tutorialDescription">
+                        Mari kita mulai membangun
+                        perusahaanmu.
+                    </p>
+
+                    <div
+                        id="tutorialObjective"
+                        class="tutorial-objective"
+                    >
+                        Mulai perjalanan bisnis.
+                    </div>
+
+                </div>
+
+
+                <div class="tutorial-footer">
+
+                    <button
+                        id="tutorialNextButton"
+                        type="button"
+                    >
+                        Lanjut
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CREATE COMPANY SCREEN
+             ================================================= -->
+
+        <section
+            id="create-company"
+            class="screen"
+        >
+
+            <div class="company-container">
+
+                <div class="company-header">
+
+                    <h1>
+                        Buat Perusahaan
+                    </h1>
+
+                    <p>
+                        Tentukan nama perusahaan
+                        yang akan membangun
+                        kerajaan bisnismu.
+                    </p>
+
+                </div>
+
+
+                <form id="companyForm">
+
+                    <label for="companyName">
+                        Nama perusahaan
+                    </label>
+
+                    <input
+                        id="companyName"
+                        name="companyName"
+                        type="text"
+                        maxlength="50"
+                        placeholder="Contoh: Jurkon Foods"
+                        autocomplete="organization"
+                        required
+                    >
+
+
+                    <button
+                        type="submit"
+                    >
+                        Buat Perusahaan
+                    </button>
+
+                </form>
+
+
+                <p
+                    id="companyError"
+                    class="error-message"
+                    aria-live="polite"
+                ></p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             HEADQUARTERS SCREEN
+             ================================================= -->
+
+        <section
+            id="hq"
+            class="screen"
+        >
+
+            <header class="game-header">
+
+                <div class="company-identity">
+
+                    <div
+                        id="hqCompanyName"
+                        class="company-name"
+                    >
+                        Perusahaan
+                    </div>
+
+                    <div class="company-level">
+                        Level
+                        <span id="hqCompanyLevel">
+                            1
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="company-cash">
+
+                    $
+                    <span id="hqCash">
+                        500
+                    </span>
+
                 </div>
 
             </header>
 
 
-            <div class="hq-content">
+            <main class="hq-content">
 
-                <h1>Headquarters</h1>
+                <section class="hq-welcome">
 
-                <p>
-                    Selamat datang di perusahaanmu.
-                </p>
+                    <h1>
+                        Headquarters
+                    </h1>
 
-                <div class="building-card">
+                    <p>
+                        Selamat datang di
+                        perusahaanmu.
+                    </p>
 
-                    <div class="building-icon">
-                        🏭
+                </section>
+
+
+                <section class="building-section">
+
+                    <div class="section-header">
+
+                        <h2>
+                            Fasilitas
+                        </h2>
+
                     </div>
 
-                    <div>
-                        <h2>Pabrik Pertama</h2>
 
-                        <p>
-                            Produksi belum dimulai.
-                        </p>
+                    <div
+                        id="buildingList"
+                        class="building-list"
+                    >
+
+                        <!-- Building cards
+                             akan ditambahkan
+                             oleh game engine -->
+
+                        <div
+                            id="emptyBuildingMessage"
+                            class="empty-state"
+                        >
+
+                            Belum ada fasilitas.
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        id="buildFarmButton"
+                        type="button"
+                    >
+                        Bangun Farm
+                    </button>
+
+                </section>
+
+
+                <section class="hq-status">
+
+                    <div class="status-card">
+
+                        <span>
+                            Player Level
+                        </span>
+
+                        <strong id="playerLevel">
+                            1
+                        </strong>
+
+                    </div>
+
+
+                    <div class="status-card">
+
+                        <span>
+                            Experience
+                        </span>
+
+                        <strong id="playerExperience">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="status-card">
+
+                        <span>
+                            Inventory
+                        </span>
+
+                        <strong id="inventoryCount">
+                            0
+                        </strong>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+
+            <!-- =============================================
+                 BOTTOM NAVIGATION
+                 ============================================= -->
+
+            <nav
+                id="bottomNavigation"
+                class="bottom-navigation"
+                aria-label="Navigasi utama"
+            >
+
+                <button
+                    type="button"
+                    data-screen="hq"
+                >
+                    HQ
+                </button>
+
+                <button
+                    type="button"
+                    data-screen="warehouse"
+                >
+                    Warehouse
+                </button>
+
+                <button
+                    type="button"
+                    data-screen="exchange"
+                >
+                    Exchange
+                </button>
+
+                <button
+                    type="button"
+                    data-screen="profile"
+                >
+                    Profile
+                </button>
+
+            </nav>
+
+        </section>
+
+
+        <!-- =================================================
+             WAREHOUSE SCREEN
+             ================================================= -->
+
+        <section
+            id="warehouse"
+            class="screen"
+        >
+
+            <header class="page-header">
+
+                <button
+                    type="button"
+                    data-back="hq"
+                >
+                    ←
+                </button>
+
+                <h1>
+                    Warehouse
+                </h1>
+
+            </header>
+
+
+            <main class="page-content">
+
+                <div
+                    id="warehouseInventory"
+                    class="inventory-list"
+                >
+
+                    <div class="empty-state">
+
+                        Warehouse masih kosong.
+
                     </div>
 
                 </div>
 
-            </div>
+            </main>
 
         </section>
 
-    </main>
+
+        <!-- =================================================
+             EXCHANGE SCREEN
+             ================================================= -->
+
+        <section
+            id="exchange"
+            class="screen"
+        >
+
+            <header class="page-header">
+
+                <button
+                    type="button"
+                    data-back="hq"
+                >
+                    ←
+                </button>
+
+                <h1>
+                    Exchange
+                </h1>
+
+            </header>
+
+
+            <main class="page-content">
+
+                <div class="empty-state">
+
+                    Market engine akan tersedia
+                    pada tahap berikutnya.
+
+                </div>
+
+            </main>
+
+        </section>
+
+
+        <!-- =================================================
+             PROFILE SCREEN
+             ================================================= -->
+
+        <section
+            id="profile"
+            class="screen"
+        >
+
+            <header class="page-header">
+
+                <button
+                    type="button"
+                    data-back="hq"
+                >
+                    ←
+                </button>
+
+                <h1>
+                    Profile
+                </h1>
+
+            </header>
+
+
+            <main class="page-content">
+
+                <div class="profile-card">
+
+                    <h2 id="profilePlayerName">
+                        Player
+                    </h2>
+
+                    <p>
+                        Level
+                        <span id="profilePlayerLevel">
+                            1
+                        </span>
+                    </p>
+
+                    <p>
+                        Company:
+                        <span id="profileCompanyName">
+                            -
+                        </span>
+                    </p>
+
+                </div>
+
+            </main>
+
+        </section>
+
+
+        <!-- =================================================
+             GLOBAL NOTIFICATION
+             ================================================= -->
+
+        <div
+            id="notification"
+            class="notification"
+            role="status"
+            aria-live="polite"
+        ></div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         JURKONCOMPANIES ENGINE
+         
+         IMPORTANT:
+         File order matters.
+         ===================================================== -->
+
+
+    <!-- Core -->
+
+    <script src="js/core/state.js"></script>
+
+
+    <!-- Game Systems -->
+
+    <script src="js/game/player.js"></script>
+
+    <script src="js/game/company.js"></script>
+
+    <script src="js/game/buildings.js"></script>
+
+    <script src="js/game/inventory.js"></script>
+
+
+    <!-- Tutorial -->
+
+    <script src="js/tutorial/tutorial.js"></script>
+
+
+    <!-- UI -->
+
+    <script src="js/ui/screens.js"></script>
+
+
+    <!-- Prototype / Compatibility Layer -->
 
     <script src="script.js"></script>
+
+
+    <!-- =====================================================
+         INITIAL APPLICATION BOOTSTRAP
+         ===================================================== -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                console.log(
+                    "JurkonCompanies initialized."
+                );
+
+                console.log(
+                    "GameState:",
+                    getGameState()
+                );
+
+
+                /*
+                 * ==========================================
+                 * WELCOME
+                 * ==========================================
+                 */
+
+                const startButton =
+                    document.getElementById(
+                        "startJourneyButton"
+                    );
+
+
+                if (startButton) {
+
+                    startButton.addEventListener(
+                        "click",
+                        function () {
+
+                            if (
+                                typeof TutorialEngine
+                                !== "undefined"
+                            ) {
+
+                                TutorialEngine.start();
+
+                            }
+
+                            showScreen(
+                                "tutorial"
+                            );
+
+                            updateTutorialUI();
+
+                        }
+                    );
+
+                }
+
+
+                /*
+                 * ==========================================
+                 * TUTORIAL NEXT
+                 * ==========================================
+                 */
+
+                const tutorialNextButton =
+                    document.getElementById(
+                        "tutorialNextButton"
+                    );
+
+
+                if (tutorialNextButton) {
+
+                    tutorialNextButton.addEventListener(
+                        "click",
+                        function () {
+
+                            if (
+                                typeof TutorialEngine
+                                === "undefined"
+                            ) {
+                                return;
+                            }
+
+
+                            TutorialEngine.nextStep();
+
+                            updateTutorialUI();
+
+
+                            if (
+                                GameState
+                                    .newPlayer
+                                    .tutorialCompleted
+                            ) {
+
+                                showScreen(
+                                    "create-company"
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /*
+                 * ==========================================
+                 * CREATE COMPANY
+                 * ==========================================
+                 */
+
+                const companyForm =
+                    document.getElementById(
+                        "companyForm"
+                    );
+
+
+                if (companyForm) {
+
+                    companyForm.addEventListener(
+                        "submit",
+                        function (event) {
+
+                            event.preventDefault();
+
+
+                            const input =
+                                document.getElementById(
+                                    "companyName"
+                                );
+
+
+                            const error =
+                                document.getElementById(
+                                    "companyError"
+                                );
+
+
+                            const companyName =
+                                input.value.trim();
+
+
+                            try {
+
+                                createCompany(
+                                    companyName
+                                );
+
+
+                                error.textContent =
+                                    "";
+
+
+                                showScreen(
+                                    "hq"
+                                );
+
+
+                                updateHQUI();
+
+
+                                showNotification(
+                                    "Perusahaan berhasil dibuat."
+                                );
+
+
+                            } catch (err) {
+
+                                error.textContent =
+                                    err.message;
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /*
+                 * ==========================================
+                 * BUILD FARM
+                 * ==========================================
+                 */
+
+                const buildFarmButton =
+                    document.getElementById(
+                        "buildFarmButton"
+                    );
+
+
+                if (buildFarmButton) {
+
+                    buildFarmButton.addEventListener(
+                        "click",
+                        function () {
+
+                            const building =
+                                createBuilding(
+                                    "farm"
+                                );
+
+
+                            updateHQUI();
+
+
+                            showNotification(
+                                "Farm berhasil dibangun."
+                            );
+
+
+                            if (
+                                TutorialEngine
+                                && GameState
+                                    .newPlayer
+                                    .tutorialStep === 2
+                            ) {
+
+                                TutorialEngine
+                                    .nextStep();
+
+                                updateTutorialUI();
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /*
+                 * ==========================================
+                 * BACK BUTTONS
+                 * ==========================================
+                 */
+
+                document
+                    .querySelectorAll(
+                        "[data-back]"
+                    )
+                    .forEach(
+                        function (button) {
+
+                            button.addEventListener(
+                                "click",
+                                function () {
+
+                                    showScreen(
+                                        button
+                                            .dataset
+                                            .back
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                /*
+                 * ==========================================
+                 * BOTTOM NAVIGATION
+                 * ==========================================
+                 */
+
+                document
+                    .querySelectorAll(
+                        "[data-screen]"
+                    )
+                    .forEach(
+                        function (button) {
+
+                            button.addEventListener(
+                                "click",
+                                function () {
+
+                                    showScreen(
+                                        button
+                                            .dataset
+                                            .screen
+                                    );
+
+
+                                    updateHQUI();
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                /*
+                 * ==========================================
+                 * INITIAL UI
+                 * ==========================================
+                 */
+
+                updateTutorialUI();
+
+                updateHQUI();
+
+            }
+        );
+
+
+        /*
+         * =================================================
+         * TUTORIAL UI
+         * =================================================
+         */
+
+        function updateTutorialUI() {
+
+            if (
+                typeof TutorialEngine
+                === "undefined"
+            ) {
+                return;
+            }
+
+
+            const step =
+                TutorialEngine
+                    .getCurrentStep();
+
+
+            if (!step) {
+                return;
+            }
+
+
+            const title =
+                document.getElementById(
+                    "tutorialTitle"
+                );
+
+
+            const description =
+                document.getElementById(
+                    "tutorialDescription"
+                );
+
+
+            const objective =
+                document.getElementById(
+                    "tutorialObjective"
+                );
+
+
+            const label =
+                document.getElementById(
+                    "tutorialStepLabel"
+                );
+
+
+            if (title) {
+
+                title.textContent =
+                    step.title;
+
+            }
+
+
+            if (description) {
+
+                description.textContent =
+                    step.description;
+
+            }
+
+
+            if (objective) {
+
+                objective.textContent =
+                    step.objective;
+
+            }
+
+
+            if (label) {
+
+                label.textContent =
+                    `Tutorial ${GameState
+                        .newPlayer
+                        .tutorialStep + 1}`;
+
+            }
+
+        }
+
+
+        /*
+         * =================================================
+         * HQ UI
+         * =================================================
+         */
+
+        function updateHQUI() {
+
+            const companyName =
+                document.getElementById(
+                    "hqCompanyName"
+                );
+
+
+            const companyLevel =
+                document.getElementById(
+                    "hqCompanyLevel"
+                );
+
+
+            const cash =
+                document.getElementById(
+                    "hqCash"
+                );
+
+
+            const playerLevel =
+                document.getElementById(
+                    "playerLevel"
+                );
+
+
+            const playerExperience =
+                document.getElementById(
+                    "playerExperience"
+                );
+
+
+            const inventoryCount =
+                document.getElementById(
+                    "inventoryCount"
+                );
+
+
+            const profilePlayerName =
+                document.getElementById(
+                    "profilePlayerName"
+                );
+
+
+            const profilePlayerLevel =
+                document.getElementById(
+                    "profilePlayerLevel"
+                );
+
+
+            const profileCompanyName =
+                document.getElementById(
+                    "profileCompanyName"
+                );
+
+
+            const buildings =
+                document.getElementById(
+                    "buildingList"
+                );
+
+
+            if (companyName) {
+
+                companyName.textContent =
+                    GameState.company.name
+                    || "Perusahaan";
+
+            }
+
+
+            if (companyLevel) {
+
+                companyLevel.textContent =
+                    GameState.company.level;
+
+            }
+
+
+            if (cash) {
+
+                cash.textContent =
+                    GameState.company.cash
+                    .toLocaleString("en-US");
+
+            }
+
+
+            if (playerLevel) {
+
+                playerLevel.textContent =
+                    GameState.player.level;
+
+            }
+
+
+            if (playerExperience) {
+
+                playerExperience.textContent =
+                    GameState.player.experience;
+
+            }
+
+
+            if (inventoryCount) {
+
+                inventoryCount.textContent =
+                    Object.values(
+                        GameState.inventory
+                    ).reduce(
+                        function (total, quantity) {
+
+                            return total + quantity;
+
+                        },
+                        0
+                    );
+
+            }
+
+
+            if (profilePlayerName) {
+
+                profilePlayerName.textContent =
+                    GameState.player.name
+                    || "Player";
+
+            }
+
+
+            if (profilePlayerLevel) {
+
+                profilePlayerLevel.textContent =
+                    GameState.player.level;
+
+            }
+
+
+            if (profileCompanyName) {
+
+                profileCompanyName.textContent =
+                    GameState.company.name
+                    || "-";
+
+            }
+
+
+            if (buildings) {
+
+                const empty =
+                    document.getElementById(
+                        "emptyBuildingMessage"
+                    );
+
+
+                if (
+                    GameState.buildings.length === 0
+                ) {
+
+                    if (empty) {
+
+                        empty.style.display =
+                            "block";
+
+                    }
+
+                } else {
+
+                    if (empty) {
+
+                        empty.style.display =
+                            "none";
+
+                    }
+
+                }
+
+            }
+
+        }
+
+
+        /*
+         * =================================================
+         * NOTIFICATION
+         * =================================================
+         */
+
+        function showNotification(message) {
+
+            const notification =
+                document.getElementById(
+                    "notification"
+                );
+
+
+            if (!notification) {
+                return;
+            }
+
+
+            notification.textContent =
+                message;
+
+
+            notification.classList.add(
+                "show"
+            );
+
+
+            setTimeout(
+                function () {
+
+                    notification.classList.remove(
+                        "show"
+                    );
+
+                },
+                3000
+            );
+
+        }
+
+    </script>
 
 </body>
 </html>
