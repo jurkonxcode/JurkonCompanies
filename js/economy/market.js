@@ -640,3 +640,31 @@ GameEvents.on(
         );
     }
 );
+TransactionEngine.record({
+
+    type: "market_purchase",
+
+    category: "inventory",
+
+    amount: totalCost,
+
+    productId:
+        listing.productId,
+
+    quantity,
+
+    metadata: {
+
+        listingId:
+            listing.id,
+
+        sellerId:
+            listing.sellerId,
+
+        unitPrice:
+            listing.unitPrice,
+
+        quality:
+            listing.quality
+    }
+});
