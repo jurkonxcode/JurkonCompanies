@@ -634,17 +634,25 @@ document.addEventListener(
          */
 
         const loaded =
-            await GameData.load();
+    await GameData.load();
 
+if (!loaded) {
 
-        if (!loaded) {
+    console.warn(
+        "Game data belum berhasil dimuat."
+    );
 
-            console.error(
-                "Game gagal dimulai karena data tidak tersedia."
-            );
+    console.warn(
+        "JurkonCompanies tetap menjalankan UI prototype."
+    );
 
-            return;
-        }
+} else {
+
+    console.log(
+        "Game data berhasil dimuat."
+    );
+
+}
 
 
         console.log(
