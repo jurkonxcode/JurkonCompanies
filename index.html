@@ -1194,6 +1194,33 @@
         }
 
     </script>
+    <script>
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        const loaded =
+            await GameData.load();
+
+        if (!loaded) {
+
+            console.error(
+                "Game gagal dimulai karena data tidak tersedia."
+            );
+
+            return;
+        }
+
+        console.log(
+            "JurkonCompanies siap dimainkan."
+        );
+
+        GameEvents.emit(
+            "game.ready"
+        );
+    }
+);
+    </script>
 
 </body>
 </html>
