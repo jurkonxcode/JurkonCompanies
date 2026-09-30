@@ -106,3 +106,55 @@ function createCompany() {
 
     showScreen("hq");
 }
+GameEvents.on(
+    "production.started",
+    data => {
+
+        const product =
+            GameData.getProduct(
+                data.job.productId
+            );
+
+        const name =
+            product
+                ? product.name
+                : data.job.productId;
+
+        if (
+            typeof showNotification ===
+            "function"
+        ) {
+
+            showNotification(
+                `${name} sedang diproduksi.`
+            );
+        }
+    }
+);
+
+
+GameEvents.on(
+    "production.completed",
+    data => {
+
+        const product =
+            GameData.getProduct(
+                data.job.productId
+            );
+
+        const name =
+            product
+                ? product.name
+                : data.job.productId;
+
+        if (
+            typeof showNotification ===
+            "function"
+        ) {
+
+            showNotification(
+                `Produksi selesai: ${name} × ${data.job.quantity}`
+            );
+        }
+    }
+);
