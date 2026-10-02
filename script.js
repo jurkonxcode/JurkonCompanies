@@ -1,576 +1,692 @@
 /*
  * =====================================================
  * JURKONCOMPANIES
- * MAIN GAME BOOTSTRAP
+ * MAIN GAME CONTROLLER v0.3
  * =====================================================
  *
- * Tugas file ini:
+ * Tugas:
+ * - Bootstrap game
+ * - Start Journey
+ * - Starter Company
+ * - Screen navigation
+ * - Update HUD
+ * - Tutorial
+ * - Map
  *
- * - Menghubungkan UI dengan Game Engine
- * - Memulai game
- * - Membuat Starter Company
- * - Memulai Tutorial
- * - Menghubungkan event game dengan UI
- *
- * UI BUKAN sumber data utama.
- * Semua data berasal dari GameState dan Game Engine.
+ * UI hanya membaca GameState.
+ * Game logic tetap berada di engine masing-masing.
  * =====================================================
  */
 
 
-// =====================================================
-// UI SCREEN
-// =====================================================
+/* =====================================================
+   SCREEN SYSTEM
+   ===================================================== */
 
 function showScreen(screenId) {
 
-    document.querySelectorAll(".screen").forEach(
-        screen => {
-            screen.classList.remove("active");
+    const screens =
+        document.querySelectorAll(".screen");
+
+    screens.forEach(screen => {
+
+        screen.classList.remove("active");
+
+        if (screen.id === screenId) {
+            screen.classList.add("active");
         }
-    );
 
-    const target =
-        document.getElementById(screenId);
+    });
 
-    if (!target) {
+    setCurrentScreen(screenId);
 
-        console.warn(
-            "Screen tidak ditemukan:",
-            screenId
-        );
-
-        return;
-    }
-
-    target.classList.add("active");
-
-    GameState.session.currentScreen =
-        screenId;
+    updateAllUI();
 }
 
 
-// =====================================================
-// NOTIFICATION
-// =====================================================
+/* =====================================================
+   NOTIFICATION
+   ===================================================== */
 
 function showNotification(message) {
 
-    console.log(
-        "[Notification]",
-        message
-    );
-
     const notification =
-        document.getElementById(
-            "notification"
-        );
+        document.getElementById("notification");
 
-    if (!notification) {
-        return;
-    }
+    if (!notification) return;
 
-    notification.textContent =
-        message;
+    notification.textContent = message;
 
-    notification.classList.add(
-        "show"
-    );
+    notification.classList.add("show");
 
-    setTimeout(
-        () => {
+    setTimeout(() => {
 
-            notification.classList.remove(
-                "show"
-            );
+        notification.classList.remove("show");
 
-        },
-        2500
-    );
+    }, 2500);
 }
 
 
-// =====================================================
-// UPDATE BASIC UI
-// =====================================================
+/* =====================================================
+   COMPANY UI
+   ===================================================== */
 
 function updateCompanyUI() {
 
     const company =
-        CompanyEngine.getCompany();
+        GameState.company;
 
-    const companyDisplay =
+    const companyName =
         document.getElementById(
-            "companyDisplay"
+            "hqCompanyName"
         );
 
-    if (companyDisplay) {
+    const companyLevel =
+        document.getElementById(
+            "hqCompanyLevel"
+        );
 
-        companyDisplay.textContent =
+    const cash =
+        document.getElementById(
+            "hqCash"
+        );
+
+    if (companyName) {
+        companyName.textContent =
             company.name || "Perusahaan";
     }
 
+    if (companyLevel) {
+        companyLevel.textContent =
+            `Level ${company.level}`;
+    }
 
-    const cashDisplay =
-        document.getElementById(
-            "cashDisplay"
-        );
-
-    if (cashDisplay) {
-
-        cashDisplay.textContent =
-            `$${company.cash.toLocaleString()}`;
+    if (cash) {
+        cash.textContent =
+            `$${Number(company.cash || 0).toLocaleString()}`;
     }
 }
 
 
-// =====================================================
-// UPDATE HQ
-// =====================================================
+/* =====================================================
+   HQ UI
+   ===================================================== */
 
 function updateHQUI() {
 
-    const company =
-        CompanyEngine.getCompany();
-
-    const companyName =
+    const buildingCount =
         document.getElementById(
-            "companyDisplay"
+            "buildingCount"
         );
 
-    if (companyName) {
-
-        companyName.textContent =
-            company.name;
-    }
-
-
-    const cash =
+    const inventoryCount =
         document.getElementById(
-            "cashDisplay"
+            "inventoryCount"
         );
-
-    if (cash) {
-
-        cash.textContent =
-            `$${company.cash.toLocaleString()}`;
-    }
-
-
-    const level =
-        document.getElementById(
-            "companyLevel"
-        );
-
-    if (level) {
-
-        level.textContent =
-            company.level;
-    }
-
 
     const playerLevel =
         document.getElementById(
             "playerLevel"
         );
 
+    const playerExperience =
+        document.getElementById(
+            "playerExperience"
+        );
+
+    const experienceProgress =
+        document.getElementById(
+            "experienceProgress"
+        );
+
+    if (buildingCount) {
+
+        buildingCount.textContent =
+            GameState.buildings.length;
+    }
+
+    if (inventoryCount) {
+
+        const totalInventory =
+            Object.values(
+                GameState.inventory
+            ).reduce(
+                (total, amount) =>
+                    total + Number(amount || 0),
+                0
+            );
+
+        inventoryCount.textContent =
+            totalInventory;
+    }
+
     if (playerLevel) {
 
         playerLevel.textContent =
             GameState.player.level;
     }
+
+    if (playerExperience) {
+
+        playerExperience.textContent =
+            GameState.player.experience;
+    }
+
+    if (experienceProgress) {
+
+        const level =
+            GameState.player.level;
+
+        const required =
+            level * 100;
+
+        const current =
+            GameState.player.experience;
+
+        const percent =
+            required > 0
+                ? Math.min(
+                    100,
+                    (current / required) * 100
+                )
+                : 0;
+
+        experienceProgress.style.width =
+            `${percent}%`;
+    }
+
+    updateBuildingList();
 }
 
 
-// =====================================================
-// UPDATE TUTORIAL UI
-// =====================================================
+/* =====================================================
+   BUILDING LIST
+   ===================================================== */
+
+function updateBuildingList() {
+
+    const list =
+        document.getElementById(
+            "buildingList"
+        );
+
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    GameState.buildings.forEach(
+        building => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "building-list-item";
+
+            const name =
+                getBuildingDisplayName(
+                    building.type
+                );
+
+            item.innerHTML = `
+                <strong>${name}</strong>
+                <span>Level ${building.level}</span>
+            `;
+
+            list.appendChild(item);
+        }
+    );
+}
+
+
+function getBuildingDisplayName(type) {
+
+    const names = {
+
+        hq:
+            "Headquarters",
+
+        exchange:
+            "Exchange",
+
+        farm:
+            "Farm",
+
+        grocery_store:
+            "Grocery Store"
+
+    };
+
+    return names[type] || type;
+}
+
+
+/* =====================================================
+   TUTORIAL UI
+   ===================================================== */
 
 function updateTutorialUI() {
 
-    if (
-        typeof TutorialEngine ===
-        "undefined"
-    ) {
-        return;
-    }
-
-
-    const step =
-        TutorialEngine.getCurrentStep();
-
-    if (!step) {
-        return;
-    }
-
-
-    const icon =
+    const label =
         document.getElementById(
-            "tutorialIcon"
+            "tutorialStepLabel"
         );
-
-    if (icon) {
-
-        icon.textContent =
-            step.icon || "🏢";
-    }
-
 
     const title =
         document.getElementById(
             "tutorialTitle"
         );
 
-    if (title) {
-
-        title.textContent =
-            step.title;
-    }
-
-
-    const text =
+    const description =
         document.getElementById(
-            "tutorialText"
+            "tutorialDescription"
         );
-
-    if (text) {
-
-        text.textContent =
-            step.description;
-    }
-
 
     const objective =
         document.getElementById(
             "tutorialObjective"
         );
 
-    if (objective) {
+    if (!label ||
+        !title ||
+        !description ||
+        !objective) {
 
-        objective.textContent =
-            step.objective;
+        return;
     }
 
+    /*
+     * TutorialEngine bisa berasal dari
+     * versi lama maupun versi baru.
+     */
 
-    const progress =
-        document.getElementById(
-            "tutorialStep"
-        );
+    if (
+        typeof TutorialEngine !==
+        "undefined" &&
+        typeof TutorialEngine.getCurrentStep ===
+        "function"
+    ) {
 
-    if (progress) {
+        const step =
+            TutorialEngine.getCurrentStep();
 
-        const progressData =
-            TutorialEngine.getProgress();
+        if (step) {
 
-        progress.textContent =
-            `${progressData.currentStep + 1} / ${progressData.totalSteps}`;
+            label.textContent =
+                step.label ||
+                `Langkah ${GameState.newPlayer.tutorialStep}`;
+
+            title.textContent =
+                step.title ||
+                "Tutorial";
+
+            description.textContent =
+                step.description ||
+                "";
+
+            objective.textContent =
+                step.objective ||
+                "";
+
+            return;
+        }
     }
+
+    /*
+     * Fallback agar UI tidak kosong
+     * jika TutorialEngine lama.
+     */
+
+    label.textContent =
+        "Personal Assistant";
+
+    title.textContent =
+        "Selamat datang di JurkonCompanies";
+
+    description.textContent =
+        "Personal Assistant akan membimbing perjalanan bisnis pertamamu.";
+
+    objective.textContent =
+        "Ikuti instruksi berikutnya untuk memulai.";
 }
 
 
-// =====================================================
-// MULAI PERJALANAN
-// =====================================================
+/* =====================================================
+   START JOURNEY
+   ===================================================== */
 
-function startJourney() {
+async function startJourney() {
 
     console.log(
         "================================"
     );
 
     console.log(
-        "JURKONCOMPANIES START"
+        "JURKONCOMPANIES: START JOURNEY"
     );
 
     console.log(
-        "Memulai perjalanan perusahaan..."
+        "================================"
     );
-
 
     try {
 
-        // -------------------------------------------------
-        // 1. Buat PLAYER
-        // -------------------------------------------------
+        /*
+         * Pastikan player tersedia.
+         */
 
-        if (
-            !GameState.player.id
-        ) {
+        if (!GameState.player.id) {
 
-            createPlayer(
-                "Founder"
-            );
+            createPlayer("Founder");
 
             console.log(
-                "Player dibuat:",
-                GameState.player
+                "Player berhasil dibuat."
             );
         }
 
 
-        // -------------------------------------------------
-        // 2. Buat STARTER COMPANY
-        // -------------------------------------------------
+        /*
+         * Pastikan starter company tersedia.
+         */
 
         if (
-            typeof StarterCompanyEngine ===
+            typeof StarterCompanyEngine !==
             "undefined"
         ) {
 
-            throw new Error(
-                "StarterCompanyEngine belum tersedia."
+            const result =
+                StarterCompanyEngine.create();
+
+            console.log(
+                "Starter company:",
+                result
             );
+
+        } else {
+
+            /*
+             * Fallback jika starter engine
+             * belum termuat.
+             */
+
+            if (!GameState.company.id) {
+
+                CompanyEngine.createCompany();
+
+                createBuilding("hq");
+                createBuilding("exchange");
+                createBuilding("farm");
+                createBuilding("grocery_store");
+            }
         }
 
 
-        const starterResult =
-            StarterCompanyEngine.create();
+        /*
+         * Beginner boost.
+         */
+
+        GameState.newPlayer
+            .beginnerBoostActive = true;
 
 
-        if (
-            !starterResult.success
-        ) {
+        /*
+         * Tandai tutorial dimulai.
+         */
 
-            throw new Error(
-                "Gagal membuat Starter Company."
-            );
-        }
+        GameState.newPlayer
+            .tutorialStarted = true;
 
 
-        console.log(
-            "Starter Company siap:",
-            starterResult
-        );
+        /*
+         * Update UI sebelum masuk tutorial.
+         */
+
+        updateAllUI();
 
 
-        // -------------------------------------------------
-        // 3. Update UI
-        // -------------------------------------------------
-
-        updateCompanyUI();
-
-        updateHQUI();
-
-
-        // -------------------------------------------------
-        // 4. Mulai Tutorial
-        // -------------------------------------------------
+        /*
+         * Mulai Tutorial Engine.
+         */
 
         if (
             typeof TutorialEngine !==
-            "undefined"
+            "undefined" &&
+            typeof TutorialEngine.start ===
+            "function"
         ) {
 
             TutorialEngine.start();
 
         } else {
 
-            console.warn(
-                "TutorialEngine tidak ditemukan."
-            );
+            /*
+             * Fallback jika tutorial engine
+             * belum tersedia.
+             */
 
-            showScreen("hq");
+            showScreen("tutorialScreen");
+
+            updateTutorialUI();
         }
 
 
+        /*
+         * Jika TutorialEngine tidak berpindah
+         * screen sendiri, pastikan tutorial tampil.
+         */
+
+        const tutorialScreen =
+            document.getElementById(
+                "tutorialScreen"
+            );
+
+        if (
+            tutorialScreen &&
+            !tutorialScreen.classList.contains(
+                "active"
+            )
+        ) {
+
+            showScreen("tutorialScreen");
+        }
+
+
+        updateAllUI();
+
+        showNotification(
+            "Perusahaanmu berhasil dibuat."
+        );
+
         console.log(
-            "================================"
+            "Start Journey berhasil."
         );
 
     } catch (error) {
 
         console.error(
-            "Gagal memulai JurkonCompanies:",
+            "START JOURNEY ERROR:",
             error
         );
 
-        alert(
-            "Game gagal dimulai. Buka Console untuk melihat detail error."
+        showNotification(
+            "Terjadi kesalahan saat memulai perjalanan."
         );
     }
 }
 
 
-// =====================================================
-// TUTORIAL NEXT
-// =====================================================
+/* =====================================================
+   TUTORIAL NEXT
+   ===================================================== */
 
 function nextTutorial() {
 
-    if (
-        typeof TutorialEngine ===
-        "undefined"
-    ) {
-        return;
-    }
+    try {
 
+        if (
+            typeof TutorialEngine !==
+            "undefined" &&
+            typeof TutorialEngine.next ===
+            "function"
+        ) {
 
-    const result =
-        TutorialEngine.nextStep();
+            TutorialEngine.next();
 
+            updateAllUI();
 
-    if (result === false) {
+            return;
+        }
 
-        showNotification(
-            "Selesaikan objective terlebih dahulu."
+        /*
+         * Fallback.
+         */
+
+        const step =
+            GameState.newPlayer.tutorialStep;
+
+        GameState.newPlayer.tutorialStep =
+            step + 1;
+
+        updateTutorialUI();
+
+    } catch (error) {
+
+        console.error(
+            "NEXT TUTORIAL ERROR:",
+            error
         );
-
-        return;
     }
-
-
-    updateTutorialUI();
-
-    updateCompanyUI();
-
-    updateHQUI();
-
-
-    const currentStepId =
-        TutorialEngine.getCurrentStepId();
-
-
-    // -------------------------------------------------
-    // Tutorial selesai
-    // -------------------------------------------------
-
-    if (
-        GameState.newPlayer
-            .tutorialCompleted
-    ) {
-
-        showNotification(
-            "Tutorial selesai. Selamat membangun perusahaan!"
-        );
-
-        updateHQUI();
-
-        showScreen("hq");
-
-        return;
-    }
-
-
-    // -------------------------------------------------
-    // Tetap di tutorial
-    // -------------------------------------------------
-
-    showScreen("tutorial");
-
-    console.log(
-        "Tutorial step:",
-        currentStepId
-    );
 }
 
 
-// =====================================================
-// SKIP TUTORIAL
-// =====================================================
-//
-// Untuk sekarang hanya digunakan sebagai compatibility.
-// Nantinya beginner tutorial dapat dibuat tidak bisa
-// dilewati sampai milestone tertentu.
-// =====================================================
+/* =====================================================
+   SKIP TUTORIAL
+   ===================================================== */
 
 function skipTutorial() {
 
-    console.log(
-        "Tutorial skip diminta."
-    );
+    try {
 
-    if (
-        typeof TutorialEngine !==
-        "undefined"
-    ) {
+        GameState.newPlayer
+            .tutorialCompleted = true;
 
-        TutorialEngine.complete();
+        GameState.newPlayer
+            .onboardingCompleted = true;
+
+        GameState.newPlayer
+            .tutorialStep = 0;
+
+        showScreen("hqScreen");
+
+        updateAllUI();
+
+        if (
+            typeof MapRenderer !==
+            "undefined"
+        ) {
+
+            MapRenderer.render();
+        }
+
+        showNotification(
+            "Tutorial dilewati."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "SKIP TUTORIAL ERROR:",
+            error
+        );
     }
-
-    updateCompanyUI();
-
-    updateHQUI();
-
-    showScreen("hq");
 }
 
 
-// =====================================================
-// CREATE COMPANY — COMPATIBILITY
-// =====================================================
-//
-// Form nama perusahaan tidak lagi digunakan pada awal
-// onboarding.
-//
-// Fungsi ini dipertahankan agar HTML lama tidak error.
-// Pada versi berikutnya fungsi ini akan digunakan untuk
-// rename company setelah tutorial.
-// =====================================================
+/* =====================================================
+   RENAME COMPANY
+   ===================================================== */
 
-function createCompany() {
+function renameCompanyFromUI() {
 
     const input =
         document.getElementById(
-            "companyName"
+            "companyNameInput"
         );
 
+    if (!input) return;
 
-    if (!input) {
-
-        showScreen("hq");
-
-        return;
-    }
-
-
-    const name =
+    const newName =
         input.value.trim();
 
+    if (!newName) {
 
-    if (!name) {
-
-        alert(
-            "Nama perusahaan tidak boleh kosong."
+        showNotification(
+            "Masukkan nama perusahaan."
         );
 
         return;
     }
-
 
     const result =
         CompanyEngine.renameCompany(
-            name
+            newName
         );
-
 
     if (!result.success) {
 
-        alert(
+        showNotification(
             result.error
         );
 
         return;
     }
 
+    updateAllUI();
 
-    updateCompanyUI();
+    showNotification(
+        "Nama perusahaan berhasil diubah."
+    );
 
-    updateHQUI();
-
-    showScreen("hq");
+    showScreen("hqScreen");
 }
 
 
-// =====================================================
-// BUILD FARM — COMPATIBILITY / DEBUG
-// =====================================================
-//
-// Farm sebenarnya sudah dibuat oleh Starter Company.
-// Fungsi ini tetap ada untuk sementara karena UI lama
-// masih mungkin mempunyai tombol Build Farm.
-// =====================================================
+/* =====================================================
+   OLD COMPATIBILITY: createCompany
+   ===================================================== */
+
+function createCompany() {
+
+    /*
+     * Pada sistem baru perusahaan dibuat
+     * otomatis saat Start Journey.
+     *
+     * Fungsi ini dipertahankan agar kode
+     * prototype lama tidak error.
+     */
+
+    if (GameState.company.id) {
+
+        console.log(
+            "Company sudah tersedia."
+        );
+
+        return GameState.company;
+    }
+
+    return CompanyEngine.createCompany();
+}
+
+
+/* =====================================================
+   OLD COMPATIBILITY: BUILD FARM
+   ===================================================== */
 
 function buildFarm() {
+
+    /*
+     * Farm starter sudah tersedia.
+     */
 
     const existingFarm =
         GameState.buildings.find(
@@ -578,582 +694,553 @@ function buildFarm() {
                 building.type === "farm"
         );
 
-
     if (existingFarm) {
 
         showNotification(
-            "Farm sudah tersedia."
+            "Farm starter sudah tersedia."
         );
 
         return existingFarm;
     }
 
-
     const farm =
-        createBuilding(
-            "farm"
-        );
+        createBuilding("farm");
 
+    updateAllUI();
 
     showNotification(
         "Farm berhasil dibuat."
     );
 
-
-    updateHQUI();
-
     return farm;
 }
 
 
-// =====================================================
-// TUTORIAL ACTION
-// =====================================================
-//
-// Digunakan oleh tombol utama tutorial.
-// Untuk sekarang action akan mengikuti step yang sedang
-// aktif. Engine tutorial tetap menjadi sumber kebenaran.
-// =====================================================
+/* =====================================================
+   TUTORIAL ACTION
+   ===================================================== */
 
 function tutorialAction() {
 
-    if (
-        typeof TutorialEngine ===
-        "undefined"
-    ) {
-        return;
-    }
+    try {
 
+        if (
+            typeof TutorialEngine !==
+            "undefined" &&
+            typeof TutorialEngine.action ===
+            "function"
+        ) {
 
-    const stepId =
-        TutorialEngine.getCurrentStepId();
+            TutorialEngine.action();
 
+            updateAllUI();
 
-    console.log(
-        "Tutorial action:",
-        stepId
-    );
+            return;
+        }
 
+        nextTutorial();
 
-    switch (stepId) {
+    } catch (error) {
 
-        case "welcome":
-
-            nextTutorial();
-
-            break;
-
-
-        case "building":
-
-            if (
-                GameState.buildings.some(
-                    building =>
-                        building.type === "farm"
-                )
-            ) {
-
-                nextTutorial();
-
-            } else {
-
-                buildFarm();
-            }
-
-            break;
-
-
-        case "buy_seed":
-
-            showScreen("exchange");
-
-            showNotification(
-                "Beli Seed melalui Exchange."
-            );
-
-            break;
-
-
-        case "buy_water":
-
-            showScreen("exchange");
-
-            showNotification(
-                "Beli Water melalui Exchange."
-            );
-
-            break;
-
-
-        case "production":
-
-            showScreen("hq");
-
-            showNotification(
-                "Jalankan produksi Apple di Farm."
-            );
-
-            break;
-
-
-        case "inventory":
-
-            showScreen("warehouse");
-
-            break;
-
-
-        case "market":
-
-            showScreen("exchange");
-
-            break;
-
-
-        case "complete":
-
-            showScreen("hq");
-
-            break;
-
-
-        default:
-
-            nextTutorial();
-
-            break;
+        console.error(
+            "TUTORIAL ACTION ERROR:",
+            error
+        );
     }
 }
 
 
-// =====================================================
-// PRODUCTION EVENTS
-// =====================================================
+/* =====================================================
+   UPDATE ALL UI
+   ===================================================== */
 
-GameEvents.on(
-    "production.started",
-    data => {
+function updateAllUI() {
 
-        if (!data || !data.job) {
-            return;
+    updateCompanyUI();
+
+    updateHQUI();
+
+    updateTutorialUI();
+
+    updateWarehouseUI();
+
+    updateExchangeUI();
+}
+
+
+/* =====================================================
+   WAREHOUSE UI
+   ===================================================== */
+
+function updateWarehouseUI() {
+
+    const warehouseList =
+        document.getElementById(
+            "warehouseList"
+        );
+
+    if (!warehouseList) return;
+
+    warehouseList.innerHTML = "";
+
+    const inventory =
+        GameState.inventory;
+
+    const productIds =
+        Object.keys(inventory);
+
+    if (productIds.length === 0) {
+
+        warehouseList.innerHTML = `
+            <div class="empty-state">
+                Warehouse masih kosong.
+            </div>
+        `;
+
+        return;
+    }
+
+    productIds.forEach(
+        productId => {
+
+            const quantity =
+                inventory[productId];
+
+            const product =
+                GameData.getProduct(
+                    productId
+                );
+
+            const name =
+                product
+                    ? product.name
+                    : productId;
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "warehouse-item";
+
+            item.innerHTML = `
+                <strong>${name}</strong>
+                <span>${quantity}</span>
+            `;
+
+            warehouseList.appendChild(item);
         }
+    );
+}
 
 
-        const product =
-            GameData.getProduct(
-                data.job.productId
-            );
+/* =====================================================
+   EXCHANGE UI
+   ===================================================== */
 
+function updateExchangeUI() {
 
-        const name =
-            product
-                ? product.name
-                : data.job.productId;
-
-
-        showNotification(
-            `${name} sedang diproduksi.`
+    const exchangeList =
+        document.getElementById(
+            "exchangeList"
         );
 
+    if (!exchangeList) return;
 
-        updateHQUI();
+    if (
+        typeof MarketEngine ===
+        "undefined"
+    ) {
+
+        return;
     }
-);
 
+    const listings =
+        MarketEngine.getActiveListings();
 
-GameEvents.on(
-    "production.completed",
-    data => {
+    exchangeList.innerHTML = "";
 
-        if (!data || !data.job) {
-            return;
+    if (!listings.length) {
+
+        exchangeList.innerHTML = `
+            <div class="empty-state">
+                Belum ada listing aktif.
+            </div>
+        `;
+
+        return;
+    }
+
+    listings.forEach(
+        listing => {
+
+            const product =
+                GameData.getProduct(
+                    listing.productId
+                );
+
+            const name =
+                product
+                    ? product.name
+                    : listing.productId;
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "exchange-item";
+
+            item.innerHTML = `
+                <strong>${name}</strong>
+                <span>
+                    ${listing.quantity} ×
+                    $${listing.unitPrice}
+                </span>
+            `;
+
+            exchangeList.appendChild(item);
         }
+    );
+}
 
 
-        const product =
-            GameData.getProduct(
-                data.job.productId
+/* =====================================================
+   MAP
+   ===================================================== */
+
+function initializeMap() {
+
+    if (
+        typeof MapRenderer ===
+        "undefined"
+    ) {
+
+        console.warn(
+            "MapRenderer belum tersedia."
+        );
+
+        return;
+    }
+
+    try {
+
+        MapRenderer.init(
+            "companyMap"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "MAP INIT ERROR:",
+            error
+        );
+    }
+}
+
+
+/* =====================================================
+   EVENT LISTENERS
+   ===================================================== */
+
+function setupGameEvents() {
+
+    GameEvents.on(
+        "company.created",
+        () => {
+
+            updateAllUI();
+        }
+    );
+
+
+    GameEvents.on(
+        "company.renamed",
+        () => {
+
+            updateAllUI();
+        }
+    );
+
+
+    GameEvents.on(
+        "company.cash.changed",
+        () => {
+
+            updateAllUI();
+        }
+    );
+
+
+    GameEvents.on(
+        "building.created",
+        () => {
+
+            updateAllUI();
+
+            if (
+                typeof MapRenderer !==
+                "undefined" &&
+                MapRenderer.canvas
+            ) {
+
+                MapRenderer.render();
+            }
+        }
+    );
+
+
+    GameEvents.on(
+        "production.completed",
+        () => {
+
+            updateAllUI();
+        }
+    );
+
+
+    GameEvents.on(
+        "economy.purchase.completed",
+        () => {
+
+            updateAllUI();
+        }
+    );
+
+
+    GameEvents.on(
+        "economy.sale.completed",
+        () => {
+
+            updateAllUI();
+        }
+    );
+
+
+    GameEvents.on(
+        "market.purchase.completed",
+        () => {
+
+            updateAllUI();
+        }
+    );
+
+
+    GameEvents.on(
+        "market.sale.listed",
+        () => {
+
+            updateAllUI();
+        }
+    );
+
+}
+
+
+/* =====================================================
+   DOM EVENTS
+   ===================================================== */
+
+function setupDOMEvents() {
+
+    const startButton =
+        document.getElementById(
+            "startJourneyButton"
+        );
+
+    if (startButton) {
+
+        startButton.addEventListener(
+            "click",
+            startJourney
+        );
+
+        console.log(
+            "Start Journey button aktif."
+        );
+
+    } else {
+
+        console.warn(
+            "startJourneyButton tidak ditemukan."
+        );
+    }
+
+
+    const nextButton =
+        document.getElementById(
+            "tutorialNextButton"
+        );
+
+    if (nextButton) {
+
+        nextButton.addEventListener(
+            "click",
+            nextTutorial
+        );
+    }
+
+
+    const skipButton =
+        document.getElementById(
+            "skipTutorialButton"
+        );
+
+    if (skipButton) {
+
+        skipButton.addEventListener(
+            "click",
+            skipTutorial
+        );
+    }
+
+
+    const tutorialActionButton =
+        document.getElementById(
+            "tutorialActionButton"
+        );
+
+    if (tutorialActionButton) {
+
+        tutorialActionButton.addEventListener(
+            "click",
+            tutorialAction
+        );
+    }
+
+
+    const buildFarmButton =
+        document.getElementById(
+            "buildFarmButton"
+        );
+
+    if (buildFarmButton) {
+
+        buildFarmButton.addEventListener(
+            "click",
+            buildFarm
+        );
+    }
+
+
+    /*
+     * Bottom navigation.
+     */
+
+    const navButtons =
+        document.querySelectorAll(
+            "[data-screen]"
+        );
+
+    navButtons.forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const screenId =
+                        button.dataset.screen;
+
+                    if (screenId) {
+
+                        showScreen(
+                            screenId
+                        );
+                    }
+                }
             );
+        }
+    );
+}
 
 
-        const name =
-            product
-                ? product.name
-                : data.job.productId;
+/* =====================================================
+   BOOTSTRAP
+   ===================================================== */
+
+async function initializeGame() {
+
+    console.log(
+        "================================"
+    );
+
+    console.log(
+        "JURKONCOMPANIES BOOT"
+    );
+
+    console.log(
+        "================================"
+    );
 
 
-        showNotification(
-            `Produksi selesai: ${name} × ${data.job.quantity}`
-        );
+    /*
+     * Load game data.
+     */
 
+    if (
+        typeof GameData !==
+        "undefined"
+    ) {
 
-        updateHQUI();
+        const loaded =
+            await GameData.load();
 
-        updateTutorialUI();
+        if (!loaded) {
+
+            console.warn(
+                "Game data gagal dimuat."
+            );
+        }
     }
-);
 
 
-// =====================================================
-// STARTER COMPANY EVENT
-// =====================================================
+    /*
+     * Setup event system.
+     */
 
-GameEvents.on(
-    "starter.company.created",
-    data => {
+    setupGameEvents();
 
-        console.log(
-            "Starter Company Event:",
-            data
-        );
 
+    /*
+     * Setup DOM buttons.
+     */
 
-        updateCompanyUI();
+    setupDOMEvents();
 
-        updateHQUI();
-    }
-);
 
+    /*
+     * Initial UI.
+     */
 
-// =====================================================
-// COMPANY CASH EVENT
-// =====================================================
+    updateAllUI();
 
-GameEvents.on(
-    "company.cash.changed",
-    data => {
 
-        console.log(
-            "Cash berubah:",
-            data
-        );
+    /*
+     * Pastikan welcome screen
+     * menjadi screen pertama.
+     */
 
+    showScreen("welcomeScreen");
 
-        updateCompanyUI();
 
-        updateHQUI();
-    }
-);
+    /*
+     * Tandai initialized.
+     */
 
+    markInitialized();
 
-// =====================================================
-// MARKET EVENTS
-// =====================================================
 
-GameEvents.on(
-    "economy.purchase.completed",
-    data => {
+    console.log(
+        "JurkonCompanies berhasil diinisialisasi."
+    );
 
-        console.log(
-            "Purchase:",
-            data
-        );
+}
 
 
-        updateCompanyUI();
-
-        updateHQUI();
-
-        updateTutorialUI();
-    }
-);
-
-
-GameEvents.on(
-    "economy.sale.completed",
-    data => {
-
-        console.log(
-            "Sale:",
-            data
-        );
-
-
-        updateCompanyUI();
-
-        updateHQUI();
-
-        updateTutorialUI();
-    }
-);
-
-
-GameEvents.on(
-    "market.purchase.completed",
-    data => {
-
-        console.log(
-            "Market purchase:",
-            data
-        );
-
-
-        updateCompanyUI();
-
-        updateHQUI();
-
-        updateTutorialUI();
-    }
-);
-
-
-// =====================================================
-// TUTORIAL EVENTS
-// =====================================================
-
-GameEvents.on(
-    "tutorial.started",
-    data => {
-
-        console.log(
-            "Tutorial started:",
-            data
-        );
-
-
-        updateTutorialUI();
-
-        showScreen(
-            "tutorial"
-        );
-    }
-);
-
-
-GameEvents.on(
-    "tutorial.step.changed",
-    data => {
-
-        console.log(
-            "Tutorial step changed:",
-            data
-        );
-
-
-        updateTutorialUI();
-    }
-);
-
-
-GameEvents.on(
-    "tutorial.objective.completed",
-    data => {
-
-        console.log(
-            "Tutorial objective completed:",
-            data
-        );
-
-
-        updateTutorialUI();
-    }
-);
-
-
-GameEvents.on(
-    "tutorial.completed",
-    data => {
-
-        console.log(
-            "================================"
-        );
-
-        console.log(
-            "TUTORIAL SELESAI"
-        );
-
-        console.log(
-            data
-        );
-
-        console.log(
-            "================================"
-        );
-
-
-        updateCompanyUI();
-
-        updateHQUI();
-
-
-        showNotification(
-            "Tutorial selesai!"
-        );
-    }
-);
-
-
-// =====================================================
-// DOM READY
-// =====================================================
+/* =====================================================
+   START
+   ===================================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
-    async function () {
-
-        console.log(
-            "JurkonCompanies DOM siap."
-        );
-
-
-        // -------------------------------------------------
-        // Load Game Data
-        // -------------------------------------------------
-
-        if (
-            typeof GameData !==
-            "undefined"
-        ) {
-
-            await GameData.load();
-
-        } else {
-
-            console.error(
-                "GameData tidak ditemukan."
-            );
-        }
-
-
-        // -------------------------------------------------
-        // Tombol Mulai Perjalanan
-        // -------------------------------------------------
-
-        const startButton =
-            document.getElementById(
-                "startButton"
-            );
-
-
-        if (startButton) {
-
-            startButton.addEventListener(
-                "click",
-                startJourney
-            );
-
-            console.log(
-                "Start button siap."
-            );
-
-        } else {
-
-            console.warn(
-                "startButton tidak ditemukan."
-            );
-        }
-
-
-        // -------------------------------------------------
-        // Tombol Tutorial Next
-        // -------------------------------------------------
-
-        const nextButton =
-            document.getElementById(
-                "tutorialNextButton"
-            );
-
-
-        if (nextButton) {
-
-            nextButton.addEventListener(
-                "click",
-                nextTutorial
-            );
-        }
-
-
-        // -------------------------------------------------
-        // Tombol Tutorial Action
-        // -------------------------------------------------
-
-        const actionButton =
-            document.getElementById(
-                "tutorialActionButton"
-            );
-
-
-        if (actionButton) {
-
-            actionButton.addEventListener(
-                "click",
-                tutorialAction
-            );
-        }
-
-
-        // -------------------------------------------------
-        // Tombol Skip Tutorial
-        // -------------------------------------------------
-
-        const skipButton =
-            document.getElementById(
-                "skipTutorial"
-            );
-
-
-        if (skipButton) {
-
-            skipButton.addEventListener(
-                "click",
-                skipTutorial
-            );
-        }
-
-
-        // -------------------------------------------------
-        // Initial UI
-        // -------------------------------------------------
-
-        updateCompanyUI();
-
-        updateHQUI();
-
-        updateTutorialUI();
-
-
-        // -------------------------------------------------
-        // Pastikan Welcome tampil
-        // -------------------------------------------------
-
-        if (
-            !GameState.company.id
-        ) {
-
-            showScreen(
-                "welcome"
-            );
-
-        } else {
-
-            showScreen(
-                "hq"
-            );
-        }
-
-
-        // -------------------------------------------------
-        // Game Initialized
-        // -------------------------------------------------
-
-        markInitialized();
-
-
-        console.log(
-            "================================"
-        );
-
-        console.log(
-            "JURKONCOMPANIES READY"
-        );
-
-        console.log(
-            "GameState:",
-            GameState
-        );
-
-        console.log(
-            "================================"
-        );
-    }
+    initializeGame
 );
