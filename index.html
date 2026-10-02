@@ -11,8 +11,8 @@
     >
 
     <meta
-        name="description"
-        content="JurkonCompanies - Business Simulation Game"
+        name="theme-color"
+        content="#f3f5f1"
     >
 
     <title>JurkonCompanies</title>
@@ -24,323 +24,267 @@
 
 </head>
 
-
 <body>
 
-<div id="app">
+    <!-- =================================================
+         APPLICATION
+         ================================================= -->
+
+    <main id="app">
 
 
-    <!-- =====================================================
-         WELCOME
-         ===================================================== -->
+        <!-- =================================================
+             WELCOME SCREEN
+             ================================================= -->
 
-    <section
-        id="welcome"
-        class="screen active"
-    >
+        <section
+            id="welcome"
+            class="screen active"
+        >
 
-        <div class="welcome-container">
+            <div class="welcome-container">
 
-            <div class="logo">
-                JURKON
-                <span>COMPANIES</span>
-            </div>
+                <div class="welcome-logo">
+                    JC
+                </div>
 
-            <p class="welcome-subtitle">
-                Bangun perusahaanmu.
-                Kelola sumber daya.
-                Kuasai pasar.
-            </p>
-
-            <button
-                id="startJourneyButton"
-                type="button"
-            >
-                Mulai Perjalanan
-            </button>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- =====================================================
-         TUTORIAL
-         ===================================================== -->
-
-    <section
-        id="tutorial"
-        class="screen"
-    >
-
-        <div class="tutorial-container">
-
-            <div class="tutorial-header">
-
-                <span id="tutorialStepLabel">
-                    Tutorial 1 / 8
-                </span>
-
-                <h1 id="tutorialTitle">
-                    Selamat datang
+                <h1>
+                    JurkonCompanies
                 </h1>
 
+                <p>
+                    Bangun perusahaanmu.
+                    Kelola produksi.
+                    Kuasai pasar.
+                </p>
+
+                <button
+                    id="startJourneyButton"
+                    class="primary-button"
+                    type="button"
+                >
+                    Mulai Perjalanan
+                </button>
+
             </div>
 
+        </section>
 
-            <div class="tutorial-content">
+
+        <!-- =================================================
+             TUTORIAL SCREEN
+             ================================================= -->
+
+        <section
+            id="tutorial"
+            class="screen"
+        >
+
+            <div class="tutorial-container">
 
                 <div
                     id="tutorialIcon"
                     class="tutorial-icon"
                 >
-                    🏢
+                    JC
                 </div>
-
-
-                <p id="tutorialDescription">
-                    Mari kita mulai membangun
-                    perusahaanmu.
-                </p>
-
 
                 <div
-                    id="tutorialObjective"
-                    class="tutorial-objective"
+                    id="tutorialStepLabel"
+                    class="tutorial-step-label"
                 >
-                    Mulai perjalanan bisnis.
+                    Langkah 1
                 </div>
 
-            </div>
+                <h2 id="tutorialTitle">
+                    Selamat datang
+                </h2>
 
+                <p id="tutorialDescription">
+                    Selamat datang di
+                    JurkonCompanies.
+                </p>
 
-            <div class="tutorial-footer">
+                <div class="tutorial-objective">
+
+                    <span>
+                        Tujuan
+                    </span>
+
+                    <strong id="tutorialObjective">
+                        Mulai perjalanan bisnis.
+                    </strong>
+
+                </div>
+
+                <button
+                    id="tutorialActionButton"
+                    class="primary-button"
+                    type="button"
+                    hidden
+                >
+                    Lakukan
+                </button>
 
                 <button
                     id="tutorialNextButton"
+                    class="secondary-button"
                     type="button"
                 >
                     Lanjut
                 </button>
 
-
                 <button
-                    id="tutorialActionButton"
+                    id="skipTutorialButton"
+                    class="text-button"
                     type="button"
-                    style="display: none;"
                 >
-                    Lakukan
+                    Lewati tutorial
                 </button>
 
             </div>
 
-        </div>
-
-    </section>
+        </section>
 
 
+        <!-- =================================================
+             COMPANY NAME SCREEN
+             ================================================= -->
 
-    <!-- =====================================================
-         CREATE COMPANY
-         
-         Disimpan untuk fitur rename company nanti.
-         Tidak digunakan pada awal onboarding.
-         ===================================================== -->
+        <section
+            id="create-company"
+            class="screen"
+        >
 
-    <section
-        id="create-company"
-        class="screen"
-    >
+            <div class="form-container">
 
-        <div class="company-container">
+                <div class="section-kicker">
+                    PERUSAHAAN
+                </div>
 
-            <div class="company-header">
-
-                <h1>
+                <h2>
                     Ganti Nama Perusahaan
-                </h1>
+                </h2>
 
                 <p>
-                    Nama awal perusahaan dibuat
-                    secara otomatis. Kamu dapat
-                    menggantinya nanti.
+                    Perusahaanmu sudah dibuat.
+                    Sekarang kamu dapat memberikan
+                    nama yang kamu inginkan.
                 </p>
 
-            </div>
+                <form id="companyForm">
 
+                    <label
+                        for="companyNameInput"
+                    >
+                        Nama perusahaan
+                    </label>
 
-            <form id="companyForm">
+                    <input
+                        id="companyNameInput"
+                        type="text"
+                        maxlength="40"
+                        autocomplete="organization"
+                        placeholder="Masukkan nama perusahaan"
+                    >
 
-                <label for="companyName">
-                    Nama perusahaan
-                </label>
+                    <button
+                        class="primary-button"
+                        type="submit"
+                    >
+                        Simpan Nama
+                    </button>
 
-                <input
-                    id="companyName"
-                    name="companyName"
-                    type="text"
-                    maxlength="50"
-                    placeholder="Contoh: Jurkon Foods"
-                    autocomplete="organization"
-                    required
-                >
-
-
-                <button
-                    type="submit"
-                >
-                    Simpan Nama
-                </button>
-
-            </form>
-
-
-            <p
-                id="companyError"
-                class="error-message"
-                aria-live="polite"
-            ></p>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- =====================================================
-         HEADQUARTERS
-         ===================================================== -->
-
-    <section
-        id="hq"
-        class="screen"
-    >
-
-        <header class="game-header">
-
-            <div class="company-identity">
-
-                <div
-                    id="hqCompanyName"
-                    class="company-name"
-                >
-                    Perusahaan
-                </div>
-
-                <div class="company-level">
-
-                    Level
-
-                    <span id="hqCompanyLevel">
-                        1
-                    </span>
-
-                </div>
+                </form>
 
             </div>
 
-
-            <div class="company-cash">
-
-                $
-                <span id="hqCash">
-                    500
-                </span>
-
-            </div>
-
-        </header>
+        </section>
 
 
-        <main class="hq-content">
+        <!-- =================================================
+             HQ / COMPANY SCREEN
+             ================================================= -->
 
+        <section
+            id="hq"
+            class="screen"
+        >
 
-            <section class="hq-welcome">
+            <header class="top-bar">
 
-                <h1>
-                    Headquarters
-                </h1>
+                <div>
 
-                <p>
-                    Pusat kendali perusahaanmu.
-                </p>
+                    <div class="section-kicker">
+                        HEADQUARTERS
+                    </div>
 
-            </section>
-
-
-
-            <!-- BUILDINGS -->
-
-            <section class="building-section">
-
-                <div class="section-header">
-
-                    <h2>
-                        Fasilitas
+                    <h2 id="hqCompanyName">
+                        Perusahaan
                     </h2>
 
                 </div>
 
-
-                <div
-                    id="buildingList"
-                    class="building-list"
-                >
-
-                    <div
-                        id="emptyBuildingMessage"
-                        class="empty-state"
-                    >
-                        Belum ada fasilitas.
-                    </div>
-
-                </div>
-
-
-                <button
-                    id="buildFarmButton"
-                    type="button"
-                >
-                    Bangun Farm
-                </button>
-
-            </section>
-
-
-
-            <!-- STATUS -->
-
-            <section class="hq-status">
-
-
-                <div class="status-card">
+                <div class="company-level">
 
                     <span>
-                        Player Level
+                        LV
                     </span>
 
-                    <strong id="playerLevel">
+                    <strong id="hqCompanyLevel">
                         1
                     </strong>
 
                 </div>
 
+            </header>
 
-                <div class="status-card">
+
+            <!-- =================================================
+                 COMPANY MAP
+                 ================================================= -->
+
+            <div class="company-map-container">
+
+                <canvas
+                    id="companyMap"
+                    aria-label="Map perusahaan JurkonCompanies"
+                ></canvas>
+
+            </div>
+
+
+            <!-- =================================================
+                 COMPANY SUMMARY
+                 ================================================= -->
+
+            <div class="company-summary">
+
+                <div class="summary-item">
 
                     <span>
-                        Experience
+                        Cash
                     </span>
 
-                    <strong id="playerExperience">
+                    <strong id="hqCash">
+                        $500
+                    </strong>
+
+                </div>
+
+                <div class="summary-item">
+
+                    <span>
+                        Buildings
+                    </span>
+
+                    <strong id="buildingCount">
                         0
                     </strong>
 
                 </div>
 
-
-                <div class="status-card">
+                <div class="summary-item">
 
                     <span>
                         Inventory
@@ -352,14 +296,315 @@
 
                 </div>
 
-
-            </section>
-
-        </main>
+            </div>
 
 
+            <!-- =================================================
+                 PLAYER PROGRESS
+                 ================================================= -->
 
-        <!-- BOTTOM NAV -->
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <div class="section-kicker">
+                            FOUNDER
+                        </div>
+
+                        <h3>
+                            Progress
+                        </h3>
+
+                    </div>
+
+                    <div class="level-display">
+
+                        <strong id="playerLevel">
+                            1
+                        </strong>
+
+                        <span>
+                            Level
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="experience-row">
+
+                    <div class="experience-label">
+
+                        <span>
+                            Experience
+                        </span>
+
+                        <strong id="playerExperience">
+                            0 XP
+                        </strong>
+
+                    </div>
+
+                    <div class="experience-bar">
+
+                        <div
+                            id="experienceProgress"
+                            class="experience-progress"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 BUILDINGS
+                 ================================================= -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <div class="section-kicker">
+                            COMPANY
+                        </div>
+
+                        <h3>
+                            Buildings
+                        </h3>
+
+                    </div>
+
+                    <span id="buildingCountLabel">
+                        0
+                    </span>
+
+                </div>
+
+                <div
+                    id="buildingList"
+                    class="building-list"
+                >
+
+                    <div class="empty-state">
+                        Belum ada building.
+                    </div>
+
+                </div>
+
+                <button
+                    id="buildFarmButton"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Bangun Farm
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             WAREHOUSE SCREEN
+             ================================================= -->
+
+        <section
+            id="warehouse"
+            class="screen"
+        >
+
+            <header class="top-bar">
+
+                <div>
+
+                    <div class="section-kicker">
+                        INVENTORY
+                    </div>
+
+                    <h2>
+                        Warehouse
+                    </h2>
+
+                </div>
+
+            </header>
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <div class="section-kicker">
+                            STOCK
+                        </div>
+
+                        <h3>
+                            Persediaan
+                        </h3>
+
+                    </div>
+
+                    <strong id="warehouseTotal">
+                        0
+                    </strong>
+
+                </div>
+
+                <div
+                    id="warehouseList"
+                    class="building-list"
+                >
+
+                    <div class="empty-state">
+                        Belum ada barang.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             EXCHANGE SCREEN
+             ================================================= -->
+
+        <section
+            id="exchange"
+            class="screen"
+        >
+
+            <header class="top-bar">
+
+                <div>
+
+                    <div class="section-kicker">
+                        MARKET
+                    </div>
+
+                    <h2>
+                        Exchange
+                    </h2>
+
+                </div>
+
+            </header>
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <div class="section-kicker">
+                            MARKETPLACE
+                        </div>
+
+                        <h3>
+                            Pasar
+                        </h3>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="exchangeList"
+                    class="building-list"
+                >
+
+                    <div class="empty-state">
+                        Market akan tersedia
+                        dalam tahap berikutnya.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PROFILE SCREEN
+             ================================================= -->
+
+        <section
+            id="profile"
+            class="screen"
+        >
+
+            <header class="top-bar">
+
+                <div>
+
+                    <div class="section-kicker">
+                        ACCOUNT
+                    </div>
+
+                    <h2>
+                        Profile
+                    </h2>
+
+                </div>
+
+            </header>
+
+            <div class="panel">
+
+                <div class="profile-row">
+
+                    <span>
+                        Founder
+                    </span>
+
+                    <strong id="profilePlayerName">
+                        Founder
+                    </strong>
+
+                </div>
+
+                <div class="profile-row">
+
+                    <span>
+                        Level
+                    </span>
+
+                    <strong id="profilePlayerLevel">
+                        1
+                    </strong>
+
+                </div>
+
+                <div class="profile-row">
+
+                    <span>
+                        Company
+                    </span>
+
+                    <strong id="profileCompanyName">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             BOTTOM NAVIGATION
+             ================================================= -->
 
         <nav
             id="bottomNavigation"
@@ -369,255 +614,144 @@
 
             <button
                 type="button"
+                class="nav-button active"
                 data-screen="hq"
             >
-                HQ
-            </button>
 
+                <span class="nav-icon">
+                    HQ
+                </span>
+
+                <span>
+                    Company
+                </span>
+
+            </button>
 
             <button
                 type="button"
+                class="nav-button"
                 data-screen="warehouse"
             >
-                Warehouse
-            </button>
 
+                <span class="nav-icon">
+                    WH
+                </span>
+
+                <span>
+                    Warehouse
+                </span>
+
+            </button>
 
             <button
                 type="button"
+                class="nav-button"
                 data-screen="exchange"
             >
-                Exchange
-            </button>
 
+                <span class="nav-icon">
+                    EX
+                </span>
+
+                <span>
+                    Exchange
+                </span>
+
+            </button>
 
             <button
                 type="button"
+                class="nav-button"
                 data-screen="profile"
             >
-                Profile
+
+                <span class="nav-icon">
+                    ME
+                </span>
+
+                <span>
+                    Profile
+                </span>
+
             </button>
 
         </nav>
 
-    </section>
+
+        <!-- =================================================
+             GLOBAL NOTIFICATION
+             ================================================= -->
+
+        <div
+            id="notification"
+            class="notification"
+            role="status"
+            aria-live="polite"
+        ></div>
 
 
-
-    <!-- =====================================================
-         WAREHOUSE
-         ===================================================== -->
-
-    <section
-        id="warehouse"
-        class="screen"
-    >
-
-        <header class="page-header">
-
-            <button
-                type="button"
-                data-back="hq"
-            >
-                ←
-            </button>
-
-            <h1>
-                Warehouse
-            </h1>
-
-        </header>
-
-
-        <main class="page-content">
-
-            <div
-                id="warehouseInventory"
-                class="inventory-list"
-            >
-
-                <div class="empty-state">
-                    Warehouse masih kosong.
-                </div>
-
-            </div>
-
-        </main>
-
-    </section>
-
+    </main>
 
 
     <!-- =====================================================
-         EXCHANGE
+         GAME CORE
          ===================================================== -->
 
-    <section
-        id="exchange"
-        class="screen"
-    >
-
-        <header class="page-header">
-
-            <button
-                type="button"
-                data-back="hq"
-            >
-                ←
-            </button>
-
-            <h1>
-                Exchange
-            </h1>
-
-        </header>
-
-
-        <main class="page-content">
-
-            <div
-                id="exchangeProducts"
-                class="exchange-products"
-            >
-
-                <div class="empty-state">
-                    Exchange sedang disiapkan.
-                </div>
-
-            </div>
-
-        </main>
-
-    </section>
-
+    <script src="js/core/state.js"></script>
+    <script src="js/core/events.js"></script>
+    <script src="js/core/data.js"></script>
 
 
     <!-- =====================================================
-         PROFILE
+         GAME
          ===================================================== -->
 
-    <section
-        id="profile"
-        class="screen"
-    >
-
-        <header class="page-header">
-
-            <button
-                type="button"
-                data-back="hq"
-            >
-                ←
-            </button>
-
-            <h1>
-                Profile
-            </h1>
-
-        </header>
-
-
-        <main class="page-content">
-
-            <div class="profile-card">
-
-                <h2 id="profilePlayerName">
-                    Player
-                </h2>
-
-
-                <p>
-
-                    Level
-
-                    <span id="profilePlayerLevel">
-                        1
-                    </span>
-
-                </p>
-
-
-                <p>
-
-                    Company:
-
-                    <span id="profileCompanyName">
-                        -
-                    </span>
-
-                </p>
-
-            </div>
-
-        </main>
-
-    </section>
-
+    <script src="js/game/player.js"></script>
+    <script src="js/game/company.js"></script>
+    <script src="js/game/buildings.js"></script>
+    <script src="js/game/inventory.js"></script>
+    <script src="js/game/starter.js"></script>
 
 
     <!-- =====================================================
-         GLOBAL NOTIFICATION
+         ECONOMY
          ===================================================== -->
 
-    <div
-        id="notification"
-        class="notification"
-        role="status"
-        aria-live="polite"
-    ></div>
+    <script src="js/economy/assets.js"></script>
+    <script src="js/economy/transactions.js"></script>
+    <script src="js/economy/economy.js"></script>
+    <script src="js/economy/economy.test.js"></script>
+    <script src="js/economy/production.js"></script>
+    <script src="js/economy/market.js"></script>
 
 
-</div>
+    <!-- =====================================================
+         TUTORIAL
+         ===================================================== -->
+
+    <script src="js/tutorial/tutorial.js"></script>
 
 
+    <!-- =====================================================
+         UI
+         ===================================================== -->
 
-<!-- =========================================================
-     JURKONCOMPANIES ENGINE
-
-     URUTAN SCRIPT SANGAT PENTING
-     ========================================================= -->
-
-
-<!-- CORE -->
-
-<script src="js/core/state.js"></script>
-<script src="js/core/events.js"></script>
-<script src="js/core/data.js"></script>
+    <script src="js/ui/screens.js"></script>
 
 
-<!-- GAME -->
+    <!-- =====================================================
+         MAP
+         ===================================================== -->
 
-<script src="js/game/player.js"></script>
-<script src="js/game/company.js"></script>
-<script src="js/game/buildings.js"></script>
-<script src="js/game/inventory.js"></script>
-<script src="js/game/starter.js"></script>
+    <script src="js/map/MapRenderer.js"></script>
 
 
-<!-- ECONOMY -->
+    <!-- =====================================================
+         MAIN BOOTSTRAP
+         ===================================================== -->
 
-<script src="js/economy/assets.js"></script>
-<script src="js/economy/transactions.js"></script>
-<script src="js/economy/economy.js"></script>
-<script src="js/economy/economy.test.js"></script>
-<script src="js/economy/production.js"></script>
-<script src="js/economy/market.js"></script>
-
-
-<!-- TUTORIAL -->
-
-<script src="js/tutorial/tutorial.js"></script>
-
-
-<!-- UI -->
-
-<script src="js/ui/screens.js"></script>
-
-
-<!-- MAIN APPLICATION -->
-
-<script src="script.js"></script>
-
+    <script src="script.js"></script>
 
 </body>
 
